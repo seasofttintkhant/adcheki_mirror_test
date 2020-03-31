@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class ApiBaseController extends Controller
 {
-    //
     /**
      * @param int $http_status
      * @param int $status
@@ -16,12 +15,13 @@ class ApiBaseController extends Controller
      * @param array $data
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function jsonResponse($http_status=200, $status=1, $headers=[], $message=[], $data=[]){
+    protected function jsonResponse($http_status = 200, $status = 1, $headers = [], $message = [], $data = [])
+    {
         return response()->json([
             "status" => $status,
             "message" => $message,
             "headers" => $headers,
             "data" => $data
-        ],$http_status);
+        ], $http_status);
     }
 }
