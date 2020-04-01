@@ -101,7 +101,7 @@ class AdvanceEmailValidator
      */
     public function setEmailFrom($email)
     {
-        if (!self::validate($email)) {
+        if (!$this->validate($email)) {
             $this->set_error('Invalid address : ' . $email);
             $this->edebug($this->ErrorInfo);
             if ($this->exceptions) {
@@ -149,7 +149,7 @@ class AdvanceEmailValidator
      * @param string $email
      * @return boolean True if valid.
      */
-    public static function validate($email)
+    public function validate($email)
     {
         return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
     }

@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23975aa7-8e4b-4f18-8f13-bfb371acaaa2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Services/AdvanceEmailValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Services/AdvanceEmailValidator.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -133,7 +132,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="C:/wamp64/www/emailtest" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -177,7 +176,9 @@
       <updated>1585552384626</updated>
       <workItem from="1585552386571" duration="5120000" />
       <workItem from="1585619862466" duration="1334000" />
-      <workItem from="1585643025531" duration="6652000" />
+      <workItem from="1585643025531" duration="9629000" />
+      <workItem from="1585653916654" duration="5552000" />
+      <workItem from="1585703200675" duration="13891000" />
     </task>
     <servers />
   </component>
@@ -185,13 +186,21 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1585630031559">
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1585704275700">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1585630031559" />
+    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1585704275700" />
     <state x="492" y="54" key="refactoring.ChangeSignatureDialog" timestamp="1585648013162">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="492" y="54" key="refactoring.ChangeSignatureDialog/0.0.1536.824@0.0.1536.824" timestamp="1585648013161" />
+    <state x="425" y="187" key="run.anything.popup" timestamp="1585704815478">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="425" y="187" key="run.anything.popup/0.0.1536.824@0.0.1536.824" timestamp="1585704815478" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1585717240570">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1585717240570" />
   </component>
 </project>
