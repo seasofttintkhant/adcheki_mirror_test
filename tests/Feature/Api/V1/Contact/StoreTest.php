@@ -27,7 +27,10 @@ class StoreTest extends TestCase
 
         // Assert
         $response->assertStatus(201);
-        $response->assertJson([
+        $response->assertExactJson([
+            'status' => 1,
+            'message' => [],
+            'headers' => [],
             'data' => [
                 ['email' => 'mgmg@gmail', 'status' => 'true'],
                 ['email' => 'kyawkyaw@gmail', 'status' => 'false']

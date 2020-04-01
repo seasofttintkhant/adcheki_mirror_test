@@ -14,7 +14,11 @@ class ContactController extends ApiBaseController
             'device_id' => $request->device_id
         ]);
 
-        $storedDevice->contacts()->createMany($request->contacts);
+        $storedContacts = $storedDevice->contacts()->createMany($request->contacts);
+
+        $emails = $storedContacts->pluck('email')->all();
+
+        $this->validateEmails($emails);
 
         return $this->jsonResponse(
             201,
@@ -27,4 +31,7 @@ class ContactController extends ApiBaseController
             ]
         );
     }
+
+    public function validateEmails(array $emails = [])
+    { }
 }
