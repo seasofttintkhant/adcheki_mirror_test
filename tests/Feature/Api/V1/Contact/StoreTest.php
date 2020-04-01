@@ -17,8 +17,16 @@ class StoreTest extends TestCase
         $contacts = [
             'device_id' => 'abcdef123456',
             'contacts' => [
-                ['email' => 'mgmg@gmail.com', 'name' => 'Mg Mg', 'phone' => '090000001'],
-                ['email' => 'kyawkyaw@gmail.com', 'name' => 'Kyaw Kyaw', 'phone' => '090000002']
+                [
+                    'emails' => ['mgmg@gmail.com', 'mgmg2@gmail.com'],
+                    'name' => 'Mg Mg',
+                    'phones' => ['09000001', '090000003'],
+                ],
+                [
+                    'emails' => ['kyawkyaw@gmail.com', 'kyawkyaw2@gmail.com'],
+                    'name' => 'Kyaw Kyaw',
+                    'phones' => ['09000002', '090000004']
+                ]
             ]
         ];
 
@@ -27,14 +35,22 @@ class StoreTest extends TestCase
 
         // Assert
         $response->assertStatus(201);
-        $response->assertExactJson([
-            'status' => 1,
-            'message' => [],
-            'headers' => [],
-            'data' => [
-                ['email' => 'mgmg@gmail', 'status' => 'true'],
-                ['email' => 'kyawkyaw@gmail', 'status' => 'false']
-            ]
+        $this->assertDatabaseHas('devices', [
+            'id' => 1,
+            'device_id' => $contacts['device_id']
         ]);
+        $this->assertDatabaseHas('contacts', [
+            'id' => 1,
+
+        ]);
+        // $response->assertExactJson([
+        //     'status' => 1,
+        //     'message' => [],
+        //     'headers' => [],
+        //     'data' => [
+        //         ['email' => 'mgmg@gmail', 'status' => 'true'],
+        //         ['email' => 'kyawkyaw@gmail', 'status' => 'false']
+        //     ]
+        // ]);
     }
 }
