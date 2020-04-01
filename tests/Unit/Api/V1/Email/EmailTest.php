@@ -1,17 +1,19 @@
 <?php
 
-namespace Tests\Feature\Api\V1\Contact;
+namespace Tests\Unit\Api\V1\Email;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use App\Device;
 use Tests\TestCase;
+use App\Models\Contact;
+use App\Models\Email;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-class StoreTest extends TestCase
+class EmailTest extends TestCase
 {
     use RefreshDatabase;
 
     /** @test */
-    public function aDeviceCanStoreTheContacts()
+    public function itCanStoreTheEmails()
     {
         // Arrange
         $contacts = [
@@ -30,54 +32,52 @@ class StoreTest extends TestCase
             ]
         ];
 
+        $storedDevice = Device::create(['device_id' => $contacts['device_id']]);
+
         // Act
-        $response = $this->postJson(route('contacts.store'), $contacts);
+        foreach ($contacts['contacts'] as $contact) {
+            $storedContact = $storedDevice->contacts()->create([
+                'data' => json_encode($contact)
+            ]);
+            foreach ($contact['emails'] as $email) {
+                $storedContact->emails()->create([
+                    'email' => $email
+                ]);
+            }
+        }
+
+        $storedContacts = Contact::all();
+
+        $storedEmails = Email::all();
 
         // Assert
-        $response->assertStatus(201);
-        $this->assertDatabaseHas('devices', [
-            'id' => 1,
-            'device_id' => $contacts['device_id']
-        ]);
-        $this->assertDatabaseHas('contacts', [
-            'id' => 1,
-            'device_id' => 1,
-            'data' => json_encode($contacts['contacts'][0])
-        ]);
-        $this->assertDatabaseHas('contacts', [
-            'id' => 2,
-            'device_id' => 1,
-            'data' => json_encode($contacts['contacts'][1])
-        ]);
         $this->assertDatabaseHas('emails', [
             'id' => 1,
-            'contact_id' => 1,
+            'contact_id' => $storedContacts[0]->id,
             'email' => $contacts['contacts'][0]['emails'][0],
             'status' => 0
         ]);
         $this->assertDatabaseHas('emails', [
             'id' => 2,
-            'contact_id' => 1,
+            'contact_id' => $storedContacts[0]->id,
             'email' => $contacts['contacts'][0]['emails'][1],
             'status' => 0
         ]);
         $this->assertDatabaseHas('emails', [
             'id' => 3,
-            'contact_id' => 2,
+            'contact_id' => $storedContacts[1]->id,
             'email' => $contacts['contacts'][1]['emails'][0],
             'status' => 0
         ]);
         $this->assertDatabaseHas('emails', [
             'id' => 4,
-            'contact_id' => 2,
+            'contact_id' => $storedContacts[1]->id,
             'email' => $contacts['contacts'][1]['emails'][1],
             'status' => 0
         ]);
-        $response->assertExactJson([
-            'status' => 1,
-            'message' => [],
-            'headers' => [],
-            'data' => []
-        ]);
+        $this->assertEquals($contacts['contacts'][0]['emails'][0], $storedEmails[0]->email);
+        $this->assertEquals($contacts['contacts'][0]['emails'][1], $storedEmails[1]->email);
+        $this->assertEquals($contacts['contacts'][1]['emails'][0], $storedEmails[2]->email);
+        $this->assertEquals($contacts['contacts'][1]['emails'][1], $storedEmails[3]->email);
     }
 }
