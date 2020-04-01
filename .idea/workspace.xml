@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="23975aa7-8e4b-4f18-8f13-bfb371acaaa2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Services/AdvanceEmailValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Services/AdvanceEmailValidator.php" afterDir="false" />
-    </list>
+    <list default="true" id="23975aa7-8e4b-4f18-8f13-bfb371acaaa2" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -179,6 +175,7 @@
       <workItem from="1585643025531" duration="9629000" />
       <workItem from="1585653916654" duration="5552000" />
       <workItem from="1585703200675" duration="13891000" />
+      <workItem from="1585737937377" duration="322000" />
     </task>
     <servers />
   </component>
