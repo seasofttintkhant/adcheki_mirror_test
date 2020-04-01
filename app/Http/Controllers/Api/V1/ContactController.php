@@ -10,53 +10,116 @@ use App\Services\AdvanceEmailValidator;
 class ContactController extends ApiBaseController
 {
     public function check(){
-        $email = "aherkersoemin@gmail.com";
-        $gg = new AdvanceEmailValidator();
-        $gg->setStreamTimeoutWait(20);
-        $gg->setEmailFrom('seasoft.tint.khant@gmail.com');
-        if(!$gg->validate($email)){
-            return "wrong email format";
-        }
-        $mxs = $gg->getMXrecords($gg->parse_email($email));
-        $max_connection_timeout  = 30;
-        $timeout = ceil($max_connection_timeout / count($mxs));
-        foreach ($mxs as $host){
-            $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
-            $gg->setSteam($steam);
-            if ($steam === FALSE) {
-                return "Problem with the tcp socket";
-            } else {
-                stream_set_timeout($steam, $gg->stream_timeout);
-                stream_set_blocking($steam, 1);
+        ini_set("max_execution_time",500);
+        $email_validator = new AdvanceEmailValidator();
+        $email_validator->setStreamTimeoutWait(20);
+        $email_validator->setEmailFrom('seasoft.tint.khant@gmail.com');
 
-                if ($gg->_streamCode($gg->_streamResponse()) == '220') {
-//                    $gg->edebug("Connection success {$host}");
-                    break;
+        $emails = [
+            "chittatthu98@gmail.com",
+            "aherkersoemin@gmail.com",
+            "khant.a.tint@seasoft.asia",
+            "xx@seasoft.asia",
+            "aaa@bbb"
+        ];
+
+        $result = [];
+
+        $temp_emails = [];
+        foreach ($emails as $email){
+            if($email_validator->validate($email)){
+                $result[$email] = [
+                    "valid" => true,
+                    "exist" => false
+                ];
+                $domain =  $email_validator->parse_email($email);
+                $temp_emails[$domain][] = $email;
+            }else{
+                $result[$email] = [
+                    "valid" => false,
+                    "exist" => false
+                ];
+            }
+        }
+        $emails_arr = $temp_emails;
+
+        $domains = array_keys($emails_arr);
+
+        $mx_records_arr = [];
+        foreach ($domains as $domain){
+            $mx_records = $email_validator->getMXrecords($domain);
+            $max_connection_timeout  = 30;
+            $timeout = ceil($max_connection_timeout / count($mx_records));
+            foreach ($mx_records as $host){
+                $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
+                $email_validator->setSteam($steam);
+                if ($steam === FALSE) {
+                    return "Problem with the tcp socket";
                 } else {
-                    fclose($steam);
-                    $steam = FALSE;
+                    stream_set_timeout($steam, $email_validator->stream_timeout);
+                    stream_set_blocking($steam, 1);
+
+                    if ($email_validator->_streamCode($email_validator->_streamResponse()) == '220') {
+                        $mx_records_arr[$domain][] = $host;
+                    } else {
+                        fclose($steam);
+                        $steam = FALSE;
+                    }
                 }
             }
         }
 
-        $gg->_streamQuery("HELO " . $gg->parse_email($gg->from));
-        $gg->_streamResponse();
-        $gg->_streamQuery("MAIL FROM: <{$gg->from}>");
-        $gg->_streamResponse();
-        $gg->_streamQuery("RCPT TO: <{$email}>");
-        $code = $gg->_streamCode($gg->_streamResponse());
-        $gg->_streamResponse();
-        $gg->_streamQuery("RSET");
-        $gg->_streamResponse();
-        $code2 = $gg->_streamCode($gg->_streamResponse());
-        $gg->_streamQuery("QUIT");
-        fclose($gg->stream);
+        foreach($emails_arr as $domain_1 => $emails){
+            $host = "";
+            foreach($mx_records_arr as $domain_2 => $mx_records){
+                if($domain_1 === $domain_2){
+                    if(count($mx_records) > 1){
+                        $host = $mx_records[rand(0,count($mx_records)-1)];
+                    }else{
+                        $host = $mx_records[0];
+                    }
+                }
+            }
+            if($host){
+                \Log::info($host);
+                foreach($emails as $email){
+                    $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
+                    $email_validator->setSteam($steam);
+                    if ($steam === FALSE) {
+                        return "Problem with the tcp socket";
+                    } else {
+                        stream_set_timeout($steam, $email_validator->stream_timeout);
+                        stream_set_blocking($steam, 1);
 
-        $code = !empty($code2) ? $code2 : $code;
+                        if ($email_validator->_streamCode($email_validator->_streamResponse()) == '220') {
+                            $code = $this->checkEmail($email_validator,$email);
+                            $result[$email]["exist"] = $this->checkStatusCode($code);
+                        }
+                    }
+                }
+            }
+        }
 
-        var_dump($this->checkStatusCode($code));
-
+        return $result;
     }
+
+    public function checkEmail($email_validator, $email){
+        $email_validator->_streamQuery("HELO " . $email_validator->parse_email($email_validator->from));
+        $email_validator->_streamResponse();
+        $email_validator->_streamQuery("MAIL FROM: <{$email_validator->from}>");
+        $email_validator->_streamResponse();
+        $email_validator->_streamQuery("RCPT TO: <{$email}>");
+        $code = $email_validator->_streamCode($email_validator->_streamResponse());
+        $email_validator->_streamResponse();
+        $email_validator->_streamQuery("RSET");
+        $email_validator->_streamResponse();
+        $code2 = $email_validator->_streamCode($email_validator->_streamResponse());
+        $email_validator->_streamQuery("QUIT");
+        fclose($email_validator->stream);
+
+        return $code = !empty($code2) ? $code2 : $code;
+    }
+
 
     public function checkStatusCode($code){
         switch ($code) {
