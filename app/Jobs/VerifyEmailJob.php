@@ -48,6 +48,5 @@ class VerifyEmailJob implements ShouldQueue
             'device_id' => $this->device_id,
             'result' => $result
         ]);
-        //
     }
 }
