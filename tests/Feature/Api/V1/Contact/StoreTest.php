@@ -25,11 +25,10 @@ class StoreTest extends TestCase
                 [
                     'emails' => ['kyawkyaw@gmail.com', 'kyawkyaw2@gmail.com'],
                     'name' => 'Kyaw Kyaw',
-                    'phones' => ['09000002', '090000004']
+                    'phones' => ['09000002', '090000004'],
                 ]
             ]
         ];
-
         // Act
         $response = $this->postJson(route('contacts.store'), $contacts);
 

@@ -31,9 +31,8 @@ class IndexTest extends TestCase
         foreach ($emails as $email) {
             $arrayEmails[] = $email->only('email', 'status');
         }
-
         // Act
-        $response = $this->getJson(route('results.show', $device->device_id));
+        $response = $this->getJson(route('results.show', 1232131));
 
         // Assert
         $response->assertStatus(200);
