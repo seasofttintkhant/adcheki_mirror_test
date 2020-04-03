@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDevicesTable extends Migration
+class CreateEmailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class CreateDevicesTable extends Migration
      */
     public function up()
     {
-        Schema::create('devices', function (Blueprint $table) {
+        Schema::create('emails', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('device_id')->index();
+            $table->unsignedBigInteger('contact_id')->index();
+            $table->string('email')->index();
+            $table->boolean('status')->default(0);
             $table->timestamps();
         });
     }
@@ -27,6 +29,6 @@ class CreateDevicesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('devices');
+        Schema::dropIfExists('emails');
     }
 }

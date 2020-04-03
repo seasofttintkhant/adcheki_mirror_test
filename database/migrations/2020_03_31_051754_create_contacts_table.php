@@ -16,9 +16,7 @@ class CreateContactsTable extends Migration
         Schema::create('contacts', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('device_id')->index();
-            $table->string('email');
-            $table->string('name')->nullable();
-            $table->string('phone')->nullable();
+            $table->json('data');
             $table->timestamps();
         });
     }
