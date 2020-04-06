@@ -495,6 +495,7 @@ class AdvanceEmailValidator
                  * 250 Requested mail action okay, completed
                  * email address was accepted
                  */
+                return 2;
             case '450':
             case '451':
             case '452':
@@ -509,9 +510,8 @@ class AdvanceEmailValidator
                  * email address was greylisted (or some temporary error occured on the MTA)
                  * i believe that e-mail exists
                  */
-                return 2;
             case '550':
-                return 1;
+                return 0;
             default:
                 return 1;
         }
