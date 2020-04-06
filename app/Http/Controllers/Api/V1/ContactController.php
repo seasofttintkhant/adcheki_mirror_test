@@ -46,56 +46,24 @@ class ContactController extends ApiBaseController
 
         $domains = array_keys($emails_arr);
 
-        $mx_records_arr = [];
-        foreach ($domains as $domain) {
+        foreach($domains as $domain){
             $mx_records = $email_validator->getMXrecords($domain);
             $max_connection_timeout  = 30;
             $timeout = ceil($max_connection_timeout / count($mx_records));
-            foreach ($mx_records as $host) {
+            $emails = $emails_arr[$domain];
+            foreach ($emails as $email) {
+                $host = $mx_records[rand(0,count($mx_records)-1)];
                 $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
                 $email_validator->setSteam($steam);
-                if ($steam === FALSE) {
-                    return "Problem with the tcp socket";
-                } else {
+                if ($steam !== FALSE) {
                     stream_set_timeout($steam, $email_validator->stream_timeout);
                     stream_set_blocking($steam, 1);
 
                     if ($email_validator->_streamCode($email_validator->_streamResponse()) == '220') {
-                        $mx_records_arr[$domain][] = $host;
+                        $code = $this->checkEmail($email_validator, $email);
+                        $result[$email]["exist"] = $this->checkStatusCode($code);
                     } else {
                         fclose($steam);
-                        $steam = FALSE;
-                    }
-                }
-            }
-        }
-
-        foreach ($emails_arr as $domain_1 => $emails) {
-            $host = "";
-            foreach ($mx_records_arr as $domain_2 => $mx_records) {
-                if ($domain_1 === $domain_2) {
-                    if (count($mx_records) > 1) {
-                        $host = $mx_records[rand(0, count($mx_records) - 1)];
-                    } else {
-                        $host = $mx_records[0];
-                    }
-                }
-            }
-            if ($host) {
-                \Log::info($host);
-                foreach ($emails as $email) {
-                    $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
-                    $email_validator->setSteam($steam);
-                    if ($steam === FALSE) {
-                        return "Problem with the tcp socket";
-                    } else {
-                        stream_set_timeout($steam, $email_validator->stream_timeout);
-                        stream_set_blocking($steam, 1);
-
-                        if ($email_validator->_streamCode($email_validator->_streamResponse()) == '220') {
-                            $code = $this->checkEmail($email_validator, $email);
-                            $result[$email]["exist"] = $this->checkStatusCode($code);
-                        }
                     }
                 }
             }
