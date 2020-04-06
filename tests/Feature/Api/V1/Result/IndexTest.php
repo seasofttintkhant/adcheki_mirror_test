@@ -4,8 +4,8 @@ namespace Tests\Feature\Api\V1\Result;
 
 use App\Device;
 use Tests\TestCase;
-use App\Models\Email;
 use App\Models\Contact;
+use App\Models\EmailResult;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -19,20 +19,28 @@ class IndexTest extends TestCase
         // Arrange
         $device = factory(Device::class)->create();
 
-        $contact = factory(Contact::class)->create([
+        factory(Contact::class)->create([
             'device_id' => $device->id
         ]);
 
-        $emails = factory(Email::class, 2)->create([
-            'contact_id' => $contact->id
+        factory(EmailResult::class, 2)->create([
+            'device_id' => $device->device_id
         ]);
 
-        $arrayEmails = [];
-        foreach ($emails as $email) {
-            $arrayEmails[] = $email->only('email', 'status');
+        $emailResult = EmailResult::where('device_id', $device->device_id)
+            ->latest()
+            ->first();
+
+        $assertEmails = [];
+        foreach ($emailResult->result as $key => $value) {
+            $assertEmails[] = [
+                'email' => $key,
+                'status' => $value['exist']
+            ];
         }
+
         // Act
-        $response = $this->getJson(route('results.show', $device->device_id));
+        $response = $this->getJson(route('email-results.show', $device->device_id));
 
         // Assert
         $response->assertStatus(200);
@@ -40,7 +48,7 @@ class IndexTest extends TestCase
             'status' => 1,
             'message' => [],
             'headers' => [],
-            'data' => $arrayEmails
+            'data' => $assertEmails
         ]);
     }
 }

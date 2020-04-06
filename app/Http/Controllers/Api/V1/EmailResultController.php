@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use App\Device;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\V1\ApiBaseController;
+use App\Models\EmailResult;
 
-class ResultController extends ApiBaseController
+class EmailResultController extends ApiBaseController
 {
     /**
      * Display a listing of the resource.
@@ -37,18 +38,23 @@ class ResultController extends ApiBaseController
      */
     public function show($device_id)
     {
-        $device = Device::where('device_id', $device_id)->first();
-        if ($device) {
-            $emails = [];
-            foreach ($device->emails as $email) {
-                $emails[] = $email->only('email', 'status');
+        $emailResult = EmailResult::where('device_id', $device_id)
+            ->latest()
+            ->first();
+        if ($emailResult) {
+            $emailResults = [];
+            foreach ($emailResult->result as $key => $value) {
+                $emailResults[] = [
+                    'email' => $key,
+                    'status' => $value['exist']
+                ];
             }
             return $this->jsonResponse(
                 200,
                 1,
                 [],
                 [],
-                $emails
+                $emailResults
             );
         }
         return $this->jsonResponse(

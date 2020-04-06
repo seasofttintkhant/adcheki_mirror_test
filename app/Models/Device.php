@@ -4,6 +4,7 @@ namespace App;
 
 use App\Models\Email;
 use App\Models\Contact;
+use App\Models\EmailResult;
 use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
@@ -15,8 +16,8 @@ class Device extends Model
         return $this->hasMany(Contact::class);
     }
 
-    public function emails()
+    public function emailResults()
     {
-        return $this->hasManyThrough(Email::class, Contact::class);
+        return $this->hasMany(EmailResult::class, 'device_id', 'device_id');
     }
 }

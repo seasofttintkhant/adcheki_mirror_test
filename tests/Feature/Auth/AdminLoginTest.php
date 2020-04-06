@@ -120,4 +120,29 @@ class AdminLoginTest extends TestCase
         $this->assertAuthenticatedAs($admin, 'admin');
         $response->assertRedirect(route('admin.dashboard'));
     }
+
+    /** @test */
+    public function itRedirectToLoginPageWhenAdminIsUnauthenticated()
+    {
+        // Act
+        $response = $this->get(route('admin.dashboard'));
+
+        // Assert
+        $response->assertRedirect(route('admin.login'));
+    }
+
+
+    /** @test */
+    public function itCannotGoToLoginPageWhenAdminIsAuthenticated()
+    {
+        // Arrange
+        $admin = factory(Admin::class)->make();
+        $this->actingAs($admin, 'admin');
+
+        // Act
+        $response = $this->get(route('admin.login'));
+
+        // Assert
+        $response->assertRedirect(route('admin.dashboard'));
+    }
 }

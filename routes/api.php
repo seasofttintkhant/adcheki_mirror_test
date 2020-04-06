@@ -19,6 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
     Route::apiResource('contacts', 'Api\V1\ContactController');
-    Route::apiResource('results', 'Api\V1\ResultController');
-    Route::get("email-check", 'Api\V1\ContactController@check');
+    Route::apiResource('email-results', 'Api\V1\EmailResultController');
+    Route::get('email-check', 'Api\V1\ContactController@check');
 });

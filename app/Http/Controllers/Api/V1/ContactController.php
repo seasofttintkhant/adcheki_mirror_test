@@ -15,18 +15,15 @@ class ContactController extends ApiBaseController
         ]);
         $emails = [];
         foreach ($request->contacts as $contact) {
-            $storedContact = $storedDevice->contacts()->create([
+            $storedDevice->contacts()->create([
                 'data' => json_encode($contact)
             ]);
             foreach ($contact['emails'] as $email) {
-                $storedContact->emails()->create([
-                    'email' => $email
-                ]);
                 array_push($emails, $email);
             }
         }
 
-        // VerifyEmailJob::dispatch($request->device_id, $emails);
+        VerifyEmailJob::dispatch($request->device_id, $emails);
 
         return $this->jsonResponse(
             201,

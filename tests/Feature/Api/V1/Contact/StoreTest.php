@@ -48,30 +48,6 @@ class StoreTest extends TestCase
             'device_id' => 1,
             'data' => json_encode($contacts['contacts'][1])
         ]);
-        $this->assertDatabaseHas('emails', [
-            'id' => 1,
-            'contact_id' => 1,
-            'email' => $contacts['contacts'][0]['emails'][0],
-            'status' => 0
-        ]);
-        $this->assertDatabaseHas('emails', [
-            'id' => 2,
-            'contact_id' => 1,
-            'email' => $contacts['contacts'][0]['emails'][1],
-            'status' => 0
-        ]);
-        $this->assertDatabaseHas('emails', [
-            'id' => 3,
-            'contact_id' => 2,
-            'email' => $contacts['contacts'][1]['emails'][0],
-            'status' => 0
-        ]);
-        $this->assertDatabaseHas('emails', [
-            'id' => 4,
-            'contact_id' => 2,
-            'email' => $contacts['contacts'][1]['emails'][1],
-            'status' => 0
-        ]);
         $response->assertExactJson([
             'status' => 1,
             'message' => [],

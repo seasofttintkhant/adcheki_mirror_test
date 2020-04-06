@@ -15,7 +15,7 @@ class CreateEmailResultsTable extends Migration
     {
         Schema::create('email_results', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string("device_id");
+            $table->string('device_id')->index();
             $table->json('result');
             $table->timestamps();
         });
