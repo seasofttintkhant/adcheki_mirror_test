@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Device;
+use App\Http\Resources\EmailResultResource;
 use App\Jobs\VerifyEmailJob;
+use App\Models\EmailResult;
 use Illuminate\Http\Request;
 
 class ContactController extends ApiBaseController
@@ -25,12 +27,15 @@ class ContactController extends ApiBaseController
 
         VerifyEmailJob::dispatch($request->device_id, $emails);
 
-        return $this->jsonResponse(
-            201,
-            1,
-            [],
-            [],
-            []
-        );
+        return response()->json([
+            "status" => "success"
+        ]);
+    }
+
+    public function check(Request $request)
+    {
+        $emailResult = EmailResult::where('device_id', $request->device_id)->latest()->first();
+
+        return new EmailResultResource($emailResult);
     }
 }
