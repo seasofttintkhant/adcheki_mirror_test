@@ -25,7 +25,31 @@
                                  <a href="{{ route('admin.dashboard') }}" class="nav-link active">
                                      <i class="nav-icon fas fa-tachometer-alt"></i>
                                      <p>
-                                         Dashboard
+                                         {{ __('messages.dashboard') }}
+                                     </p>
+                                 </a>
+                             </li>
+                             <li class="nav-item">
+                                 <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                                     <i class="nav-icon fas fa-tachometer-alt"></i>
+                                     <p>
+                                         {{ __('messages.domain_list') }}
+                                     </p>
+                                 </a>
+                             </li>
+                             <li class="nav-item">
+                                 <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                                     <i class="nav-icon fas fa-tachometer-alt"></i>
+                                     <p>
+                                         {{ __('messages.email_list') }}
+                                     </p>
+                                 </a>
+                             </li>
+                             <li class="nav-item">
+                                 <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                                     <i class="nav-icon fas fa-tachometer-alt"></i>
+                                     <p>
+                                         {{ __('messages.operator_list') }}
                                      </p>
                                  </a>
                              </li>

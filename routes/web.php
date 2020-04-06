@@ -15,9 +15,7 @@ Route::prefix('backend')->group(function () {
     Route::post('login', 'Auth\AdminLoginController@login')->name('admin.login');
     Route::post('logout', 'Auth\AdminLoginController@logout')->name('admin.logout');
     Route::middleware(['auth:admin'])->group(function () {
-        Route::get('/', function () {
-            return view('admin.dashboard.index');
-        })->name('admin.dashboard');
+        Route::get('/', 'Backend\AdminController@index')->name('admin.dashboard');
     });
 });
 
