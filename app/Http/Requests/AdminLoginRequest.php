@@ -24,8 +24,8 @@ class AdminLoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'bail|required|email',
-            'password' => 'bail|required|min:8'
+            'email' => 'required|email:dns',
+            'password' => 'required|min:8'
         ];
     }
 }

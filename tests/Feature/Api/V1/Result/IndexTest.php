@@ -32,7 +32,7 @@ class IndexTest extends TestCase
             $arrayEmails[] = $email->only('email', 'status');
         }
         // Act
-        $response = $this->getJson(route('results.show', 1232131));
+        $response = $this->getJson(route('results.show', $device->device_id));
 
         // Assert
         $response->assertStatus(200);

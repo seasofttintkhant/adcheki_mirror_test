@@ -8,10 +8,15 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
+        @auth
         <li class="nav-item">
-            <a class="nav-link" href="#" role="button">
-                Logout
+            <a class="nav-link" href="javascript:void(0);" role="button" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                {{ __('Logout') }}
+                <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
             </a>
         </li>
+        @endauth
     </ul>
 </nav>
