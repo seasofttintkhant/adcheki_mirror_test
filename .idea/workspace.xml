@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="23975aa7-8e4b-4f18-8f13-bfb371acaaa2" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Services/AdvanceEmailValidator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Services/AdvanceEmailValidator.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/Http/Resources/EmailResultResource.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/routes/admin.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Providers/RouteServiceProvider.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +191,7 @@
       <workItem from="1585901066568" duration="2738000" />
       <workItem from="1586136937708" duration="1220000" />
       <workItem from="1586160091176" duration="6096000" />
-      <workItem from="1586166861555" duration="6153000" />
+      <workItem from="1586166861555" duration="6341000" />
     </task>
     <servers />
   </component>
@@ -222,7 +225,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="php-line-method">
           <url>file://$PROJECT_DIR$/app/Http/Controllers/Api/V1/ContactController.php</url>
-          <line>10</line>
+          <line>12</line>
           <properties>
             <option name="className" value="\App\Http\Controllers\Api\V1\ContactController" />
             <option name="methodName" value="check" />
