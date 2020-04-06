@@ -26,7 +26,7 @@ class ContactController extends ApiBaseController
             }
         }
 
-        VerifyEmailJob::dispatch($request->device_id, $emails);
+        // VerifyEmailJob::dispatch($request->device_id, $emails);
 
         return $this->jsonResponse(
             201,
