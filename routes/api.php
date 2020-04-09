@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\AdvanceEmailValidator;
 use Illuminate\Http\Request;
 
 /*
@@ -20,4 +21,21 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('v1')->group(function () {
     Route::get("email/results", 'ContactController@check');
     Route::apiResource('emails', 'ContactController');
+    Route::get("test", function(){
+        $emails = [
+            "chittatthu98@gmail.com",
+            "chittatthu98ewerwe@gmail.com",
+            "yanlay129@yahoo.com",
+            "yanlay129erewrwer@yahoo.com",
+            "khant.a.tint@seasoft.asia",
+            "khant.a.tintxxxx@seasoft.asia",
+            "xx@seasoft.asia",
+            "aaa@bbb"
+        ];
+        $email_validator = new AdvanceEmailValidator();
+        $email_validator->setStreamTimeoutWait(20);
+        $email_validator->setEmailFrom('seasoft.tint.khant@gmail.com');
+
+        return $result = $email_validator->checkEmails($emails);
+    });
 });

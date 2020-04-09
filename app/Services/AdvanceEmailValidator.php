@@ -411,6 +411,10 @@ class AdvanceEmailValidator
 
     public function checkEmails(array $emails)
     {
+        ini_set("max_execution_time", 1000);
+        $this->setStreamTimeoutWait(20);
+        $this->setEmailFrom('seasoft.tint.khant@gmail.com');
+
         $result = [];
 
         $temp_emails = [];
@@ -418,14 +422,14 @@ class AdvanceEmailValidator
             if ($this->validate($email)) {
                 $result[$email] = [
                     "valid" => true,
-                    "exist" => false
+                    "status" => 0
                 ];
                 $domain =  $this->parse_email($email);
                 $temp_emails[$domain][] = $email;
             } else {
                 $result[$email] = [
                     "valid" => false,
-                    "exist" => false
+                    "status" => 0
                 ];
             }
         }
@@ -433,80 +437,52 @@ class AdvanceEmailValidator
 
         $domains = array_keys($emails_arr);
 
-        $mx_records_arr = [];
-        foreach ($domains as $domain) {
+        foreach($domains as $domain){
             $mx_records = $this->getMXrecords($domain);
             $max_connection_timeout  = 30;
             $timeout = ceil($max_connection_timeout / count($mx_records));
-            foreach ($mx_records as $host) {
+            $emails = $emails_arr[$domain];
+            foreach ($emails as $email) {
+                $host = $mx_records[rand(0,count($mx_records)-1)];
                 $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
                 $this->setSteam($steam);
-                if ($steam === FALSE) {
-                    return "Problem with the tcp socket";
-                } else {
+                if ($steam !== FALSE) {
                     stream_set_timeout($steam, $this->stream_timeout);
                     stream_set_blocking($steam, 1);
 
                     if ($this->_streamCode($this->_streamResponse()) == '220') {
-                        $mx_records_arr[$domain][] = $host;
+                        $code = $this->checkEmail($email);
+                        $result[$email]["status"] = $this->checkStatusCode($code);
                     } else {
                         fclose($steam);
-                        $steam = FALSE;
                     }
                 }
             }
         }
 
-        foreach ($emails_arr as $domain_1 => $emails) {
-            $host = "";
-            foreach ($mx_records_arr as $domain_2 => $mx_records) {
-                if ($domain_1 === $domain_2) {
-                    if (count($mx_records) > 1) {
-                        $host = $mx_records[rand(0, count($mx_records) - 1)];
-                    } else {
-                        $host = $mx_records[0];
-                    }
-                }
-            }
-            if ($host) {
-                \Log::info($host);
-                foreach ($emails as $email) {
-                    $steam = @stream_socket_client("tcp://" . $host . ":" . 25, $errno, $errstr, $timeout);
-                    $this->setSteam($steam);
-                    if ($steam === FALSE) {
-                        return "Problem with the tcp socket";
-                    } else {
-                        stream_set_timeout($steam, $this->stream_timeout);
-                        stream_set_blocking($steam, 1);
-
-                        if ($this->_streamCode($this->_streamResponse()) == '220') {
-                            $code = $this->checkEmail($this, $email);
-                            $result[$email]["exist"] = $this->checkStatusCode($code);
-                        }
-                    }
-                }
-            }
-        }
+//        status
+//        0 -> not exist
+//        1 -> unknown
+//        2 -> exists
 
         return $result;
     }
 
-    public function checkEmail($email_validator, $email)
+    public function checkEmail($email)
     {
-        $email_validator->_streamQuery("HELO " . $email_validator->parse_email($email_validator->from));
-        $email_validator->_streamResponse();
-        $email_validator->_streamQuery("MAIL FROM: <{$email_validator->from}>");
-        $email_validator->_streamResponse();
-        $email_validator->_streamQuery("RCPT TO: <{$email}>");
-        $code = $email_validator->_streamCode($email_validator->_streamResponse());
-        $email_validator->_streamResponse();
-        $email_validator->_streamQuery("RSET");
-        $email_validator->_streamResponse();
-        $code2 = $email_validator->_streamCode($email_validator->_streamResponse());
-        $email_validator->_streamQuery("QUIT");
-        fclose($email_validator->stream);
+        $this->_streamQuery("HELO " . $this->parse_email($this->from));
+        $this->_streamResponse();
+        $this->_streamQuery("MAIL FROM: <{$this->from}>");
+        $this->_streamResponse();
+        $this->_streamQuery("RCPT TO: <{$email}>");
+        $code = $this->_streamCode($this->_streamResponse());
+        $this->_streamResponse();
+        $this->_streamQuery("RSET");
+        $this->_streamResponse();
+        $this->_streamQuery("QUIT");
+        fclose($this->stream);
 
-        return $code = !empty($code2) ? $code2 : $code;
+        return $code;
     }
 
 
@@ -519,6 +495,7 @@ class AdvanceEmailValidator
                  * 250 Requested mail action okay, completed
                  * email address was accepted
                  */
+                return 2;
             case '450':
             case '451':
             case '452':
@@ -533,11 +510,10 @@ class AdvanceEmailValidator
                  * email address was greylisted (or some temporary error occured on the MTA)
                  * i believe that e-mail exists
                  */
-                return TRUE;
             case '550':
-                return FALSE;
+                return 0;
             default:
-                return FALSE;
+                return 1;
         }
     }
 }
