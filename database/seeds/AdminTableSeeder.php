@@ -13,7 +13,7 @@ class AdminTableSeeder extends Seeder
     public function run()
     {
         factory(Admin::class)->create([
-            'email' => 'superadmin@gmail.com',
+            'login_id' => 'superadmin',
         ]);
     }
 }

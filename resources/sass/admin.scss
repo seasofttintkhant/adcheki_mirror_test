@@ -1,2 +1,13 @@
 @import '~admin-lte/build/scss/AdminLTE';
 @import '~admin-lte/plugins/fontawesome-free/css/all.min.css';
+
+.toast-width {
+    width: 300px;
+}
+
+.input-label {
+    width: 20%;
+    font-weight: bold;
+    text-align: center;
+    line-height: 30px;
+}

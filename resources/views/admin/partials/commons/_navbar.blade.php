@@ -9,9 +9,10 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
         @auth
-        <li class="nav-item">
+        <li class="nav-item d-flex flex-row align-items-center">
+            {{ __('messages.welcome', ['name' => Auth::guard('admin')->user()->login_id ]) }} :
             <a class="nav-link" href="javascript:void(0);" role="button" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                {{ __('Logout') }}
+                {{ __('messages.logout') }}
                 <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display: none;">
                     @csrf
                 </form>

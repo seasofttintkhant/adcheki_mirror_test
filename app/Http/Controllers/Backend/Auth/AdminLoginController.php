@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Backend\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +26,7 @@ class AdminLoginController extends Controller
 
     public function login(AdminLoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->only('login_id', 'password');
         if (Auth::guard('admin')->attempt($credentials)) {
             return redirect()->intended(route('admin.dashboard'));
         }

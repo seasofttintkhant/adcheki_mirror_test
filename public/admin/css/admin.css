@@ -32575,3 +32575,14 @@ a.text-muted:hover {
   color: #ffffff;
 }
 
+.toast-width {
+  width: 300px;
+}
+
+.input-label {
+  width: 20%;
+  font-weight: bold;
+  text-align: center;
+  line-height: 30px;
+}
+
