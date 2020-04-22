@@ -14,9 +14,19 @@ class EmailResultResource extends JsonResource
      */
     public function toArray($request)
     {
+        $data = [];
+
+        foreach ($this->result as $key => $value) {
+            array_push($data, [
+                'email' => $key,
+                'exist' => $value['exist'],
+                'valid' => $value['valid']
+            ]);
+        }
+
         return [
             "device_id" => $this->device_id,
-            "result" => $this->result
+            "result" => $data
         ];
     }
 }
