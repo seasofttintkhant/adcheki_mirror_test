@@ -9,11 +9,13 @@ return [
     'domain' => 'Domain',
     'add_domain' => 'Add Domain',
     'domains_list' => 'Domains List',
+    'edit_domain' => 'Edit Domain',
     'email' => 'Email',
     'add_email' => 'Add Email',
     'emails_list' => 'Emails List',
     'edit_email' => 'Edit Email',
     'operator' => 'Operator',
     'add_operator' => 'Add Operator',
-    'operators_list' => 'Operators List'
+    'edit_operator' => 'Edit Operator',
+    'operators_list' => 'Operators List',
 ];

@@ -75,30 +75,31 @@
                                      </li>
                                  </ul>
                              </li>
-                             <li class="nav-item has-treeview">
-                                 <a href="javascript:void(0);" class="nav-link @if (request()->is('backend/operators') || request()->is('backend/operators/create')) active @endif">
-                                     <i class="nav-icon fas fa-user-shield"></i>
-                                     <p>
-                                         {{ __('messages.operator') }}
-                                         <i class="right fas fa-angle-left"></i>
-                                     </p>
-                                 </a>
-                                 <ul class="nav nav-treeview">
-                                     <li class="nav-item">
-                                         <a href="{{ route('operators.index') }}" class="nav-link @if (request()->is('backend/operators')) active @endif">
-                                             <i class="fas fa-list nav-icon"></i>
-                                             <p>{{ __('messages.operators_list') }}</p>
-                                         </a>
-                                     </li>
-                                     <li class="nav-item">
-                                         <a href="{{ route('operators.create') }}" class="nav-link @if (request()->is('backend/operators/create')) active @endif">
-                                             <i class="fas fa-plus nav-icon"></i>
-                                             <p>{{ __('messages.add_operator') }}</p>
-                                         </a>
-                                     </li>
-                                 </ul>
-                             </li>
-
+                            @if(Auth::guard('admin')->user()->role === 1)
+                            <li class="nav-item has-treeview">
+                                <a href="javascript:void(0);" class="nav-link @if (request()->is('backend/operators') || request()->is('backend/operators/create')) active @endif">
+                                    <i class="nav-icon fas fa-user-shield"></i>
+                                    <p>
+                                        {{ __('messages.operator') }}
+                                        <i class="right fas fa-angle-left"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="{{ route('operators.index') }}" class="nav-link @if (request()->is('backend/operators')) active @endif">
+                                            <i class="fas fa-list nav-icon"></i>
+                                            <p>{{ __('messages.operators_list') }}</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('operators.create') }}" class="nav-link @if (request()->is('backend/operators/create')) active @endif">
+                                            <i class="fas fa-plus nav-icon"></i>
+                                            <p>{{ __('messages.add_operator') }}</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            @endif
                          </ul>
                      </nav>
                      <!-- /.sidebar-menu -->

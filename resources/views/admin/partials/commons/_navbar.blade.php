@@ -8,7 +8,7 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-        @auth
+        @auth('admin')
         <li class="nav-item d-flex flex-row align-items-center">
             {{ __('messages.welcome', ['name' => Auth::guard('admin')->user()->login_id ]) }} :
             <a class="nav-link" href="javascript:void(0);" role="button" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

@@ -28,14 +28,6 @@
                                                 <input class="form-check-input" value="2" type="radio" name="role" @if(request()->query('role') == 2) checked @endif>
                                                 <label class="form-check-label">サイト管理者</label>
                                             </div>
-                                            <div class="form-check mx-2">
-                                                <input class="form-check-input" value="3" type="radio" name="role" @if(request()->query('role') == 3) checked @endif>
-                                                <label class="form-check-label">オペレータ1</label>
-                                            </div>
-                                            <div class="form-check mx-2">
-                                                <input class="form-check-input" value="4" type="radio" name="role" @if(request()->query('role') == 4) checked @endif>
-                                                <label class="form-check-label">オペレータ2</label>
-                                            </div>
                                         </div>
                                     </td>
                                 </tr>
@@ -45,7 +37,15 @@
                             </div>
                         </form>
                         <div id="filtered-results">
-                            <p>{{ $operators->total() }}件中 {{ $operators->currentPage() }}件~{{ $operators->lastPage() }}件 を表示</p>
+                            @php
+                            $startItems = $operators->currentPage() !== 1
+                            ? $operators->currentPage() * $operators->perPage()
+                            : $operators->currentPage();
+                            $endItems = $startItems !== 1
+                            ? $startItems + count($operators)
+                            : count($operators);
+                            @endphp
+                            <p>{{ $operators->total() }}件中 {{ $startItems }}件~{{ $endItems }}件 を表示</p>
                             <table class="table table-bordered">
                                 <thead>
                                     <tr class="text-center bg-gray-light">
@@ -74,27 +74,21 @@
                                             @case(2)
                                             サイト管理者
                                             @break
-                                            @case(3)
-                                            オペレータ1
-                                            @break
-                                            @case(4)
-                                            オペレータ2
-                                            @break
                                             @default
                                             システム管理者
                                             @break
                                             @endswitch
                                         </td>
                                         <td>
-                                            {{ $operator->permitted_ip }}
+                                            {{ $operator->permitted_ip ?: 'ANY' }}
                                         </td>
                                         <td>
-                                            <a href="{{ route('operators.edit', $operator->operator_id) }}">
+                                            <a href="{{ route('operators.edit', $operator->id) }}">
                                                 編集
                                             </a>
                                             <a href="javascript:void(0);" role="button" onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
                                                 削除
-                                                <form id="delete-form" action="{{ route('operators.destroy', $operator->operator_id) }}" method="POST" style="display: none;">
+                                                <form id="delete-form" action="{{ route('operators.destroy', $operator->id) }}" method="POST" style="display: none;">
                                                     @method('DELETE')
                                                     @csrf
                                                 </form>
@@ -116,6 +110,11 @@
                                 {{ $operators->links() }}
                             </div>
                             @endif
+                            <div class="my-2 text-right">
+                                <a href="{{ route('admin.dashboard') }}" class="text-decoration-underline">
+                                    <u>ページ上部へ</u>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

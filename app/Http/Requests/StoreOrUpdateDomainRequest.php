@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreOrUpdateOperatorRequest extends FormRequest
+class StoreOrUpdateDomainRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,15 +23,9 @@ class StoreOrUpdateOperatorRequest extends FormRequest
      */
     public function rules()
     {
-        $passwordRules = 'required';
-        if (request()->method() === "PUT") {
-            $passwordRules = 'nullable';
-        }
         return [
-            'login_id' => 'required|unique:admins,login_id,' . $this->route('operator'),
-            'password' => $passwordRules.'|min:8',
-            'role' => 'required',
-            'permitted_ip' => 'required|ip'
+            'name' => 'required|string|max:255',
+            'ip' => 'required|ip|unique:domains,default_ip,' . $this->id
         ];
     }
 }

@@ -1,8 +1,8 @@
 @extends('layouts.admin')
 
-@section('title', 'オペレーターの編集')
+@section('title', __('messages.edit_operator'))
 @section('content')
-@include('admin.partials.commons._content_header', ['title' => 'オペレーターの編集'])
+@include('admin.partials.commons._content_header', ['title' => __('messages.edit_operator')])
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -10,7 +10,7 @@
                 <div class="card">
                     <div class="card-body">
                         <p>オペレーター情報を編集する。</p>
-                        <form action="{{ route('operators.update', $operator->operator_id) }}" method="POST">
+                        <form action="{{ route('operators.update', $operator->id) }}" method="POST">
                             @method('PUT')
                             @csrf
                             <input type="hidden" name="id" value="{{ $operator->id }}">
@@ -58,14 +58,6 @@
                                                  <input class="form-check-input" value="2" type="radio" name="role" @if ($operator->role == 2) checked @endif>
                                                 @endif
                                                 <label class="form-check-label">サイト管理者</label>
-                                            </div>
-                                            <div class="form-check mx-2">
-                                                <input class="form-check-input" value="3" type="radio" name="role" @if(old('role') && old('role') == 3) checked @elseif ($operator->role == 3) checked @endif>
-                                                <label class="form-check-label">オペレータ1</label>
-                                            </div>
-                                            <div class="form-check mx-2">
-                                                <input class="form-check-input" value="4" type="radio" name="role" @if(old('role') && old('role') == 4) checked @elseif ($operator->role == 4) checked @endif>
-                                                <label class="form-check-label">オペレータ2</label>
                                             </div>
                                         </div>
                                     </td>

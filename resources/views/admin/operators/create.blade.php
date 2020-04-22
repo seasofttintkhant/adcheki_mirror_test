@@ -45,25 +45,16 @@
                                     <td>
                                         <div class="form-inline">
                                             <div class="form-check mx-2">
-                                                <input class="form-check-input" value="1" type="radio" name="role" @if(old('role') && old('role') == 1) checked @endif>
+                                                <input class="form-check-input" value="1" type="radio" name="role" @if(old('role') && old('role')==1) checked @endif>
                                                 <label class="form-check-label">システム管理者</label>
                                             </div>
                                             <div class="form-check mx-2">
                                                 @if(old('role'))
-                                                <input class="form-check-input" value="2" type="radio" name="role" 
-                                                @if(old('role') && old('role') == 2) checked @endif>
+                                                <input class="form-check-input" value="2" type="radio" name="role" @if(old('role') && old('role')==2) checked @endif>
                                                 @else
-                                                 <input class="form-check-input" value="2" type="radio" name="role" checked>
+                                                <input class="form-check-input" value="2" type="radio" name="role" checked>
                                                 @endif
                                                 <label class="form-check-label">サイト管理者</label>
-                                            </div>
-                                            <div class="form-check mx-2">
-                                                <input class="form-check-input" value="3" type="radio" name="role" @if(old('role') && old('role') == 3) checked @endif>
-                                                <label class="form-check-label">オペレータ1</label>
-                                            </div>
-                                            <div class="form-check mx-2">
-                                                <input class="form-check-input" value="4" type="radio" name="role" @if(old('role') && old('role') == 4) checked @endif>
-                                                <label class="form-check-label">オペレータ2</label>
                                             </div>
                                         </div>
                                     </td>

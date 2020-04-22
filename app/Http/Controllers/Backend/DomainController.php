@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Http\Controllers\Controller;
+use App\Models\Domain;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreOrUpdateDomainRequest;
 
 class DomainController extends Controller
 {
@@ -14,7 +16,8 @@ class DomainController extends Controller
      */
     public function index()
     {
-        return view('admin.domains.index');
+        $domains = Domain::latest()->paginate(10);
+        return view('admin.domains.index', compact('domains'));
     }
 
     /**
@@ -33,9 +36,18 @@ class DomainController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreOrUpdateDomainRequest $request)
     {
-        //
+        $dnsIp = $this->dnsIp($request->name);
+        $isMatch = $this->isMatch($dnsIp, $request->ip);
+        Domain::create([
+            'name' => $request->name,
+            'default_ip' => $request->ip,
+            'dns_ip' => $dnsIp,
+            'is_match' => $isMatch
+        ]);
+
+        return redirect(route('domains.index'))->with('success', 'A domain is added.');
     }
 
     /**
@@ -46,7 +58,7 @@ class DomainController extends Controller
      */
     public function show($id)
     {
-        //
+       //
     }
 
     /**
@@ -57,7 +69,8 @@ class DomainController extends Controller
      */
     public function edit($id)
     {
-        //
+        $domain = Domain::findOrFail($id);
+        return view('admin.domains.edit', compact('domain'));
     }
 
     /**
@@ -67,9 +80,19 @@ class DomainController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StoreOrUpdateDomainRequest $request, $id)
     {
-        //
+        $domain = Domain::findOrFail($id);
+        $dnsIp = $this->dnsIp($request->name);
+        $isMatch = $this->isMatch($dnsIp, $request->ip);
+        $domain->update([
+            'name' => $request->name,
+            'default_ip' => $request->ip,
+            'dns_ip' => $dnsIp,
+            'is_match' => $isMatch
+        ]);
+
+        return redirect(route('domains.index'))->with('success', 'A domain is updated.');
     }
 
     /**
@@ -80,6 +103,17 @@ class DomainController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Domain::destroy($id);
+        return redirect(route('domains.index'))->with('success', 'A domain is removed.');
+    }
+
+    protected function dnsIp($domainName)
+    {
+        return dns_get_record($domainName, DNS_A)[0]['ip'];
+    }
+
+    protected function isMatch($dnsIp, $ip)
+    {
+        return $dnsIp === $ip;
     }
 }

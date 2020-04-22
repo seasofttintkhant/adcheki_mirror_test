@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines
@@ -139,6 +138,16 @@ return [
         'password' => [
             'required' => 'Please enter :attribute.',
             'min' => 'The :attribute must be at least :min characters.'
+        ],
+        'name' => [
+            'required' => 'Please enter domain :attribute.',
+            'string' => 'Domain :attribute must be string.',
+            'max' => 'Domain :attribute is more than allowed characters.'
+        ],
+        'ip' => [
+            'required' => 'Please enter domain :attribute.',
+            'ip' => 'Domain :attribute is invalid ip address.',
+            'unique' => 'The IP is already taken.'
         ]
     ],
 
@@ -154,5 +163,4 @@ return [
     */
 
     'attributes' => [],
-
 ];

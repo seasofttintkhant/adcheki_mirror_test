@@ -132,6 +132,24 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'email' => [
+            'required' => 'Please enter :attribute address.',
+            'email' => 'The :attribute is invalid email address.'
+        ],
+        'password' => [
+            'required' => 'Please enter :attribute.',
+            'min' => 'The :attribute must be at least :min characters.'
+        ],
+        'name' => [
+            'required' => 'Please enter domain :attribute.',
+            'string' => 'Domain :attribute must be string.',
+            'max' => 'Domain :attribute is more than allowed characters.'
+        ],
+        'ip' => [
+            'required' => 'Please enter domain :attribute.',
+            'ip' => 'Domain :attribute is invalid ip address.',
+            'unique' => 'The IP is already taken.'
+        ]
     ],
 
     /*

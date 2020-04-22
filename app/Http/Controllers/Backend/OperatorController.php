@@ -11,6 +11,7 @@ use App\Http\Requests\StoreOrUpdateOperatorRequest;
 class OperatorController extends Controller
 {
     protected $page = 3;
+    
     /**
      * Display a listing of the resource.
      *
@@ -69,15 +70,12 @@ class OperatorController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $operatorId
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($operatorId)
+    public function edit($id)
     {
-        $operator = Admin::where('operator_id', $operatorId)->first();
-        if (!$operator) {
-            abort(404);
-        }
+        $operator = Admin::findOrFail($id);
         return view('admin.operators.edit', compact('operator'));
     }
 
@@ -85,12 +83,12 @@ class OperatorController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $operatorId
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(StoreOrUpdateOperatorRequest $request, $operatorId)
+    public function update(StoreOrUpdateOperatorRequest $request, $id)
     {
-        $operator = Admin::where('operator_id', $operatorId)->first();
+        $operator = Admin::findOrFail($id);
         $operator->update([
             'login_id' => $request->login_id,
             'password' => $request->password ? bcrypt($request->password) : $operator->password,
@@ -103,14 +101,14 @@ class OperatorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $operatorId
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($operatorId)
+    public function destroy($id)
     {
-        $operator = Admin::where('operator_id', $operatorId)->first();
+        $operator = Admin::findOrFail($id);
         $operator->delete();
-        return redirect(route('operators.index'))->with('success', 'An operator is remove.');
+        return redirect(route('operators.index'))->with('success', 'An operator is removed.');
     }
 
     public function filterByRole(Request $request)
