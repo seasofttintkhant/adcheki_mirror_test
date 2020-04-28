@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -11,6 +10,8 @@ class Admin extends Authenticatable
     use Notifiable;
 
     protected $guard = 'admin';
+
+    const INITIAL_ID = 1000000000;
 
     /**
      * The attributes that are mass assignable.
@@ -40,5 +41,14 @@ class Admin extends Authenticatable
     public function username()
     {
         return 'login_id';
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function ($operator) {
+            $operator->operator_id = self::INITIAL_ID + $operator->id;
+            $operator->save();
+        });
     }
 }

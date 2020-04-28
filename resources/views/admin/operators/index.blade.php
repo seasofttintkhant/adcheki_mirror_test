@@ -10,7 +10,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{ route('operators.filter_by_role') }}" method="GET">
+                        <form action="{{ route('operators.search') }}" method="GET">
                             <table class="table table-bordered">
                                 <tr>
                                     <td class="input-label bg-gray-light">種別</td>

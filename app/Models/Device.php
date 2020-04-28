@@ -1,15 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
-use App\Models\Email;
-use App\Models\Contact;
-use App\Models\EmailResult;
 use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
-    protected $fillable = ['device_id'];
+    protected $fillable = ['device_id', 'os', 'is_checked'];
 
     public function contacts()
     {
@@ -19,5 +16,10 @@ class Device extends Model
     public function emailResults()
     {
         return $this->hasMany(EmailResult::class, 'device_id', 'device_id');
+    }
+
+    public function emails()
+    {
+        return $this->hasManyThrough(Email::class, Contact::class);
     }
 }

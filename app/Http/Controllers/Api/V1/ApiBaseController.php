@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class ApiBaseController extends Controller
 {
@@ -18,10 +17,10 @@ class ApiBaseController extends Controller
     protected function jsonResponse($http_status = 200, $status = 1, $headers = [], $message = [], $data = [])
     {
         return response()->json([
-            "status" => $status,
-            "message" => $message,
-            "headers" => $headers,
-            "data" => $data
+            'status' => $status,
+            'message' => $message,
+            'headers' => $headers,
+            'data' => $data
         ], $http_status);
     }
 }
