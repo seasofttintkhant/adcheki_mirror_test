@@ -13,7 +13,7 @@ return [
     'email' => 'メアド',
     'add_email' => 'メールアドレスの追加',
     'emails_list' => 'トメールアドレスの一覧',
-    'edit_email' => '',
+    'edit_email' => 'メールを編集',
     'operator' => 'オペレータ',
     'add_operator' => 'オペレータの追加',
     'edit_operator' => 'オペレーターの編集',

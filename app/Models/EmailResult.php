@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Device;
 use Illuminate\Database\Eloquent\Model;
 
 class EmailResult extends Model

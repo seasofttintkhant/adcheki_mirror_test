@@ -5,13 +5,14 @@ namespace App\Http\Controllers\Backend;
 use App\Models\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreOrUpdateOperatorRequest;
 
 class OperatorController extends Controller
 {
+    const INITIAL_ID = 1000000000;
+
     protected $page = 3;
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -41,13 +42,7 @@ class OperatorController extends Controller
      */
     public function store(StoreOrUpdateOperatorRequest $request)
     {
-        $lastRecord = Admin::latest()->first();
-        $nextId = 1;
-        if ($lastRecord) {
-            $nextId = $lastRecord->id + 1;
-        }
         Admin::create([
-            'operator_id' => '1' . str_pad($nextId, 9, '0', STR_PAD_LEFT),
             'login_id' => $request->login_id,
             'password' => bcrypt($request->password),
             'role' => $request->role,
@@ -106,12 +101,11 @@ class OperatorController extends Controller
      */
     public function destroy($id)
     {
-        $operator = Admin::findOrFail($id);
-        $operator->delete();
+        Admin::destroy($id);
         return redirect(route('operators.index'))->with('success', 'An operator is removed.');
     }
 
-    public function filterByRole(Request $request)
+    public function search(Request $request)
     {
         if ($request->role == 0) {
             $operators = Admin::latest()->paginate($this->page);

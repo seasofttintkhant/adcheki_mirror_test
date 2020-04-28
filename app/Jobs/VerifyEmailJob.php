@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\EmailResult;
+use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use App\Services\AdvanceEmailValidator;
@@ -14,9 +14,7 @@ class VerifyEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
     protected $device_id;
-
 
     protected $emails;
 
@@ -42,11 +40,16 @@ class VerifyEmailJob implements ShouldQueue
         $email_validator->setStreamTimeoutWait(20);
         $email_validator->setEmailFrom('seasoft.tint.khant@gmail.com');
 
-        $result = $email_validator->checkEmails($this->emails);
+        $emailResults = $email_validator->checkEmails($this->emails);
 
-        EmailResult::create([
-            'device_id' => $this->device_id,
-            'result' => $result
-        ]);
+        $device = Device::where('device_id', $this->device_id)->first();
+        $device->is_checked = true;
+        $device->save();
+        foreach ($device->emails as $email) {
+            $email->update([
+                'is_valid' => $emailResults[$email->email]['valid'],
+                'status' => $emailResults[$email->email]['status']
+            ]);
+        }
     }
 }
