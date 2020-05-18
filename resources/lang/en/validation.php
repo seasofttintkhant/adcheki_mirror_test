@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines
@@ -132,24 +131,87 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
-        'email' => [
-            'required' => 'Please enter :attribute address.',
-            'email' => 'The :attribute is invalid email address.'
+        'login_id' => [
+            'required' => 'Please enter :attribute.',
+            'regex' => 'Please enter lower case only.',
+            'unique' => 'The :attribute is already taken.'
         ],
         'password' => [
             'required' => 'Please enter :attribute.',
             'min' => 'The :attribute must be at least :min characters.'
         ],
         'name' => [
-            'required' => 'Please enter domain :attribute.',
-            'string' => 'Domain :attribute must be string.',
-            'max' => 'Domain :attribute is more than allowed characters.'
+            'required' => 'Please enter :attribute.',
+            'string' => 'The :attribute must be string.',
+            'max' => 'The :attribute is more than allowed characters.'
         ],
         'ip' => [
             'required' => 'Please enter domain :attribute.',
-            'ip' => 'Domain :attribute is invalid ip address.',
-            'unique' => 'The IP is already taken.'
-        ]
+            'ip' => 'The :attribute is invalid ip address.',
+            'unique' => 'The :attribute is already taken.'
+        ],
+        'role' => [
+            'required' => 'Please select :attribute.'
+        ],
+        'permitted_ip' => [
+            'required' => 'Please enter :attribute.',
+            'ip' => 'The :attribute is invalid ip address.',
+            'unique' => 'The :attribute is already taken.'
+        ],
+        'email' => [
+            'required' => 'Please enter :attribute.',
+            'email' => 'The :attribute is invalid email address.'
+        ],
+        'is_valid' => [
+            'required' => 'Please enter :attribute.',
+            'numeric' => 'The :attribute must be number.',
+            'between' => 'The :attribute must be between :min and :max.'
+        ],
+        'status' => [
+            'required' => 'Please enter :attribute.',
+            'numeric' => 'The :attribute must be number.',
+            'between' => 'The :attribute must be between :min and :max.'
+        ],
+        'registration_start_date' => [
+            'required_with' => 'Required when :values is present.',
+            'date' => 'The :attribute is invalid date.',
+            'before_or_equal' => 'Must be a date before or equal to :date.'
+        ],
+        'registration_end_date' => [
+            'required_with' => 'Required when :values is present.',
+            'date' => 'The :attribute is invalid date.',
+            'after_or_equal' => 'Must be a date after or equal to :date.'
+        ],
+        'update_start_date' => [
+            'required_with' => 'Required when :values is present.',
+            'date' => 'The :attribute is invalid date.',
+            'before_or_equal' => 'Must be a date before or equal to :date.'
+        ],
+        'update_end_date' => [
+            'required_with' => 'Required when :values is present.',
+            'date' => 'The :attribute is invalid date.',
+            'after_or_equal' => 'Must be a date after or equal to :date.'
+        ],
+        'is_valid_start' => [
+            'required_with' => 'Required when :values is present.',
+            'numeric' => 'The :attribute must be number.',
+            'between' => 'Must be between :min and :max.'
+        ],
+        'is_valid_end' => [
+            'required_with' => 'Required when :values is present.',
+            'numeric' => 'The :attribute must be number.',
+            'between' => 'Must be between :min and :max.'
+        ],
+        'status_start' => [
+            'required_with' => 'Required when :values is present.',
+            'numeric' => 'The :attribute must be number.',
+            'between' => 'Must be between :min and :max.'
+        ],
+        'status_end' => [
+            'required_with' => 'Required when :values is present.',
+            'numeric' => 'The :attribute must be number.',
+            'between' => 'Must be between :min and :max.'
+        ],
     ],
 
     /*
@@ -163,6 +225,23 @@ return [
     |
     */
 
-    'attributes' => [],
-
+    'attributes' => [
+        'login_id' => 'login ID',
+        'password' => 'password',
+        'name' => 'name',
+        'ip' => 'ip address',
+        'role' => 'role',
+        'permitted_ip' => 'permitted ip',
+        'email' => 'e-mail address',
+        'is_valid' => 'ok',
+        'status' => 'ng',
+        'registration_start_date' => 'registration start date',
+        'registration_end_date' => 'registration end date',
+        'update_start_date' => 'update start date',
+        'update_end_date' => 'update end date',
+        'is_valid_start' => 'ok start',
+        'is_valid_end' => 'ok end',
+        'status_start' => 'ng start',
+        'status_end' => 'ng end'
+    ]
 ];

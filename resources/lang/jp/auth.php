@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Language Lines
@@ -13,7 +12,7 @@ return [
     |
     */
 
-    'failed' => 'Invalid email or password.',
+    'failed' => '無効なログインIDまたはパスワード.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
-    'invalid_ip' => 'Invalid IP address.'
+    'invalid_ip' => '無効なIPアドレス.'
 ];

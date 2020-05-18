@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Admin extends Authenticatable
 {
@@ -50,5 +51,10 @@ class Admin extends Authenticatable
             $operator->operator_id = self::INITIAL_ID + $operator->id;
             $operator->save();
         });
+    }
+
+    public function isSuperAdmin()
+    {
+        return Auth::guard('admin')->check() && Auth::guard('admin')->user()->role == 1;
     }
 }

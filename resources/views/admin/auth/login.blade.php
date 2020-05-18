@@ -27,7 +27,7 @@
                     </div>
                     @endif
                     <div class="input-group mb-3">
-                        <input type="text" name="login_id" class="form-control @error('login_id') ? is-invalid @enderror" placeholder="Login ID" value="{{ old('login_id') ?: '' }}">
+                        <input type="text" name="login_id" class="form-control @error('login_id') ? is-invalid @enderror" placeholder="{{ __('messages.login_id') }}" value="{{ old('login_id') ?: '' }}">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -40,7 +40,7 @@
                         @enderror
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" name="password" class="form-control @error('password') ? is-invalid @enderror" placeholder="Password">
+                        <input type="password" name="password" class="form-control @error('password') ? is-invalid @enderror" placeholder="{{ __('messages.password') }}">
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock"></span>

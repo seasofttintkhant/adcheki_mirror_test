@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Backend;
 
 use App\Models\Domain;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrUpdateDomainRequest;
 
@@ -58,7 +57,7 @@ class DomainController extends Controller
      */
     public function show($id)
     {
-       //
+        //
     }
 
     /**
@@ -109,7 +108,11 @@ class DomainController extends Controller
 
     protected function dnsIp($domainName)
     {
-        return dns_get_record($domainName, DNS_A)[0]['ip'];
+        $dnsRecord = dns_get_record($domainName, DNS_A);
+        if ($dnsRecord) {
+            return $dnsRecord[0]['ip'];
+        }
+        return null;
     }
 
     protected function isMatch($dnsIp, $ip)

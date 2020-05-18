@@ -16,8 +16,8 @@ class CreateEmailsTable extends Migration
         Schema::create('emails', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('mail_address_id')->nullable();
-            $table->unsignedBigInteger('contact_id')->nullable();
-            $table->string('email')->index();
+            $table->unsignedBigInteger('device_id')->nullable();
+            $table->string('email');
             $table->boolean('is_valid')->nullable();
             $table->unsignedInteger('status')
                 ->nullable()

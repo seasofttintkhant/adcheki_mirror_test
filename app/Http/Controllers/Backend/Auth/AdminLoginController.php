@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Backend\Auth;
 
-use Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\AdminLoginRequest;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class AdminLoginController extends Controller
 {
@@ -30,7 +28,7 @@ class AdminLoginController extends Controller
         $credentials = $request->only('login_id', 'password');
         if (Auth::guard('admin')->attempt($credentials)) {
             if (Auth::guard('admin')->user()->role === 1) {
-                 return redirect()->intended(route('admin.dashboard'));
+                return redirect()->intended(route('admin.dashboard'));
             }
             if ($request->ip() !== Auth::guard('admin')->user()->permitted_ip) {
                 return redirect()

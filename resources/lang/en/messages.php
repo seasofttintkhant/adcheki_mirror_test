@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'login_id' => 'Login ID',
+    'password' => 'Password',
     'admin' => 'Admin',
     'login' => 'Login',
     'logout' => 'Logout',

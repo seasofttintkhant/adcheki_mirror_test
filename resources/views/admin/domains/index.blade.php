@@ -4,6 +4,17 @@
 
 @section('content')
 @include('admin.partials.commons._content_header', ['title' => __('messages.domains_list')])
+@php
+    function checkIsMatch($domainName, $ip)
+    {
+        $dnsIp = null;
+        $dnsRecord = dns_get_record($domainName, DNS_A);
+        if ($dnsRecord) {
+            $dnsIp = $dnsRecord[0]['ip'];
+        }
+        return $ip === $dnsIp;
+    }
+@endphp
 <section class="content">
     <div class="container-fluid">
         <div class="row">
@@ -22,22 +33,22 @@
                             <tbody>
                                 @if(isset($domains) && count($domains) > 0)
                                 @foreach($domains as $domain)
-                                <tr @unless($domain->is_match) class="bg-red" @endunless>
+                                <tr @unless($domain->is_match && checkIsMatch($domain->name, $domain->default_ip)) class="bg-red" @endunless>
                                     <td>{{ $domain->name }}</td>
                                     <td>{{ $domain->default_ip }}</td>
-                                    <td>{{ $domain->dns_ip }}</td>
+                                    <td>{{ $domain->dns_ip ?: '-' }}</td>
                                      <td>
-                                            <a href="{{ route('domains.edit', $domain->id) }}">
-                                                編集
-                                            </a>
-                                            <a href="javascript:void(0);" role="button" onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
-                                                削除
-                                                <form id="delete-form" action="{{ route('domains.destroy', $domain->id) }}" method="POST" style="display: none;">
-                                                    @method('DELETE')
-                                                    @csrf
-                                                </form>
-                                            </a>
-                                        </td>
+                                        <a href="{{ route('domains.edit', $domain->id) }}">
+                                            編集
+                                        </a>
+                                        <a href="javascript:void(0);" role="button" onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
+                                            削除
+                                            <form id="delete-form" action="{{ route('domains.destroy', $domain->id) }}" method="POST" style="display: none;">
+                                                @method('DELETE')
+                                                @csrf
+                                            </form>
+                                        </a>
+                                    </td>
                                 </tr>
                                 @endforeach
                                 @else

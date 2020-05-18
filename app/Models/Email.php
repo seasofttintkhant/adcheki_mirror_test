@@ -10,15 +10,15 @@ class Email extends Model
 
     protected $fillable = [
         'mail_address_id',
-        'contact_id',
+        'device_id',
         'email',
         'is_valid',
         'status'
     ];
 
-    public function contact()
+    public function device()
     {
-        return $this->belongsTo(Contact::class);
+        return $this->belongsTo(Device::class);
     }
 
     protected static function boot()

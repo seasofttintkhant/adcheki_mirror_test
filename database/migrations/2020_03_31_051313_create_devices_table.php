@@ -16,6 +16,7 @@ class CreateDevicesTable extends Migration
         Schema::create('devices', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('device_id')->index();
+            $table->string('fcm_token')->nullable();
             $table->tinyInteger('os')
                 ->nullable()
                 ->comment('0 => manual, 1 => android, 2 => ios');

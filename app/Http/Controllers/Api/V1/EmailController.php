@@ -3,12 +3,10 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Device;
-use App\Models\EmailResult;
 use App\Jobs\VerifyEmailJob;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailCollection;
-use App\Http\Resources\EmailResultResource;
 
 class EmailController extends Controller
 {
@@ -34,18 +32,19 @@ class EmailController extends Controller
     {
         $storedDevice = Device::create([
             'device_id' => $request->device_id,
+            'fcm_token' => $request->fcm_token,
             'os' => $request->os
         ]);
 
         $emails = [];
 
         foreach ($request->contacts as $contact) {
-            $storedContact = $storedDevice->contacts()->create([
+            $storedDevice->contacts()->create([
                 'data' => json_encode($contact)
             ]);
             foreach ($contact['emails'] as $email) {
                 array_push($emails, $email);
-                $storedContact->emails()->create([
+                $storedDevice->emails()->create([
                     'email' => $email,
                 ]);
             }
@@ -94,10 +93,6 @@ class EmailController extends Controller
 
     public function getResults(Request $request)
     {
-        // $emailResults = EmailResult::where('device_id', $request->device_id)->latest()->first();
-
-        // return new EmailResultResource($emailResults);
-
         $device = Device::where('device_id', $request->device_id)
             ->where('is_checked', 1)
             ->with('emails')

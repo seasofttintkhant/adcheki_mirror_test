@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'login_id' => 'ログインID',
+    'password' => 'パスワード',
     'admin' => 'Admin',
     'login' => 'Login',
     'logout' => 'ログアウト',

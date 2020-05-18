@@ -131,24 +131,87 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
-        'email' => [
-            'required' => 'Please enter :attribute address.',
-            'email' => 'The :attribute is invalid email address.'
+        'login_id' => [
+            'required' => '入ってください :attribute.',
+            'regex' => '入ってください小文字のみ.',
+            'unique' => 'の :attribute すでに使用されている.'
         ],
         'password' => [
-            'required' => 'Please enter :attribute.',
-            'min' => 'The :attribute must be at least :min characters.'
+            'required' => '入ってください :attribute.',
+            'min' => 'の :attribute 少なくともでなければなりません :minキャラクター.'
         ],
         'name' => [
-            'required' => 'Please enter domain :attribute.',
-            'string' => 'Domain :attribute must be string.',
-            'max' => 'Domain :attribute is more than allowed characters.'
+            'required' => '入ってくださいドメイン :attribute.',
+            'string' => 'の :attribute 文字列でなければなりません.',
+            'max' => 'の :attribute 許可されている以上キャラクター.'
         ],
         'ip' => [
-            'required' => 'Please enter domain :attribute.',
-            'ip' => 'Domain :attribute is invalid ip address.',
-            'unique' => 'The IP is already taken.'
-        ]
+            'required' => '入ってくださいドメイン :attribute.',
+            'ip' => 'の :attribute 無効なIPアドレスです.',
+            'unique' => 'の :attribute すでに使用されている.'
+        ],
+        'role' => [
+            'required' => '選んでください :attribute.'
+        ],
+        'permitted_ip' => [
+            'required' => '入ってください  :attribute.',
+            'ip' => 'の :attribute 無効なIPアドレスです.',
+            'unique' => 'の :attribute すでに使用されている.'
+        ],
+        'email' => [
+            'required' => '入ってください :attribute.',
+            'email' => 'の :attribute 無効なメールアドレスです.'
+        ],
+        'is_valid' => [
+            'required' => '入ってください :attribute.',
+            'numeric' => 'の :attribute 数でなければなりません.',
+            'between' => 'の :attribute 間にある必要があります :min そして :max.'
+        ],
+        'status' => [
+            'required' => '入ってください :attribute.',
+            'numeric' => 'の  :attribute 数でなければなりません.',
+            'between' => 'の  :attribute 間にある必要があります :min そして :max.'
+        ],
+        'registration_start_date' => [
+            'required_with' => '必要な場合 :values いる.',
+            'date' => 'の :attribute 無効な日付です.',
+            'before_or_equal' => '以前の日付である必要があります :date.'
+        ],
+        'registration_end_date' => [
+            'required_with' => '必要な場合 :values いる.',
+            'date' => 'の :attribute 無効な日付です.',
+            'after_or_equal' => '以降の日付である必要があります :date.'
+        ],
+        'update_start_date' => [
+            'required_with' => '必要な場合 :values いる.',
+            'date' => 'の :attribute 無効な日付です.',
+            'before_or_equal' => '以前の日付である必要があります :date.'
+        ],
+        'update_end_date' => [
+            'required_with' => '必要な場合 :values いる.',
+            'date' => 'の :attribute 無効な日付です.',
+            'after_or_equal' => '以降の日付である必要があります :date.'
+        ],
+        'is_valid_start' => [
+            'required_with' => '必要な場合 :values いる.',
+            'numeric' => 'の :attribute 数でなければなりません.',
+            'between' => '間にある必要があります :min そして :max.'
+        ],
+        'is_valid_end' => [
+            'required_with' => '必要な場合 :values いる.',
+            'numeric' => 'の :attribute 数でなければなりません.',
+            'between' => '間にある必要があります :min そして :max.'
+        ],
+        'status_start' => [
+            'required_with' => '必要な場合 :values いる.',
+            'numeric' => 'の :attribute 数でなければなりません.',
+            'between' => '間にある必要があります :min そして :max.'
+        ],
+        'status_end' => [
+            'required_with' => '必要な場合 :values いる.',
+            'numeric' => 'の :attribute 数でなければなりません.',
+            'between' => '間にある必要があります :min そして :max.'
+        ],
     ],
 
     /*
@@ -162,5 +225,23 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'login_id' => 'ログインID',
+        'password' => 'パスワード',
+        'name' => 'ドメイン',
+        'ip' => 'IP アドレス',
+        'role' => '種別',
+        'permitted_ip' => '許可IP',
+        'email' => 'メールアドレス',
+        'is_valid' => 'ok数',
+        'status' => 'ng数',
+        'registration_start_date' => '登録開始日',
+        'registration_end_date' => '登録終了日',
+        'update_start_date' => '更新開始日',
+        'update_end_date' => '終了日を更新',
+        'is_valid_start' => 'ok数 開始',
+        'is_valid_end' => 'ok数 終わり',
+        'status_start' => 'ng数 開始',
+        'status_end' => 'ng数 終わり'
+    ]
 ];

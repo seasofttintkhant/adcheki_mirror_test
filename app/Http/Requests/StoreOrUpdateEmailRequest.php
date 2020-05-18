@@ -24,7 +24,7 @@ class StoreOrUpdateEmailRequest extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email|unique:emails,email,' . $this->route('email'),
+            'email' => 'required|email',
             'is_valid' => 'required|numeric|between:0,1',
             'status' => 'required|numeric|between:0,2'
         ];

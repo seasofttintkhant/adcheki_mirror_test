@@ -12,9 +12,4 @@ class Contact extends Model
     {
         return $this->belongsTo(Device::class);
     }
-
-    public function emails()
-    {
-        return $this->hasMany(Email::class);
-    }
 }

@@ -238,9 +238,17 @@
                                     </td>
                                 </tr>
                             </table>
-                            <div class="mt-4">
-                                <input type="submit" value="追加" class="btn btn-default bg-gray-light">
+                            <div class="row mt-4">
+                                <div class="mx-2">
+                                    <input type="submit" name="search" value="メールアドレスの表示" class="btn btn-default bg-gray-light">
+                                </div>
+                                @can('download', App\Models\Email::class)
+                                <div class="mx-2">
+                                    <input type="submit" name="download" value="CSVダウンロード" class="btn btn-default bg-gray-light">
+                                </div>
+                                @endcan
                             </div>
+                           
                         </form>
                         <div id="filtered-results" class="mt-4">
                             @php
@@ -288,20 +296,23 @@
                                             {{ $email->status }}
                                         </td>
                                         <td>
-                                            @if($email->contact && $email->contact->device)
-                                                @if($email->contact->device->os === 1)
+                                            @if($email->device)
+                                                @if($email->device->os === 1)
                                                     android 
-                                                @elseif($email->contact->device->os === 2)
+                                                @elseif($email->device->os === 2)
                                                     ios
                                                 @endif
                                             @else
-                                                manual
+                                                -
                                             @endif
                                         </td>
                                         <td>
+                                            @can('edit', $email)
                                             <a href="{{ route('emails.edit', $email->id) }}">
                                                 編集
                                             </a>
+                                            @endcan
+                                            @can('remove', $email)
                                             <a href="javascript:void(0);" role="button"
                                                 onclick="event.preventDefault(); document.getElementById('delete-form').submit();">
                                                 削除
@@ -312,6 +323,7 @@
                                                     @csrf
                                                 </form>
                                             </a>
+                                            @endcan
                                         </td>
                                     </tr>
                                     @endforeach
@@ -349,7 +361,7 @@
         autohide: true,
         close: false,
         delay: 3000,
-        class: 'bg-success toast-width',
+        class: 'bg-success toast-width m-4',
         title: 'Success',
         body: '{{ session("success") }}'
     });

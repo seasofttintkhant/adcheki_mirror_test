@@ -17,7 +17,7 @@ class CreateDomainsTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('default_ip');
-            $table->string('dns_ip');
+            $table->string('dns_ip')->nullable();
             $table->boolean('is_match')->default(false);
             $table->timestamps();
         });

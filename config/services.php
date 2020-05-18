@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -30,4 +29,8 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'push_noti' => [
+        'server_key' => env('FCM_SERVER_KEY'),
+        'endpoint' => env('FCM_POST_REQUEST_ENDPOINT')
+    ]
 ];
