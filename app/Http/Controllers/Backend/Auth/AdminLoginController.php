@@ -31,6 +31,7 @@ class AdminLoginController extends Controller
                 return redirect()->intended(route('admin.dashboard'));
             }
             if ($request->ip() !== Auth::guard('admin')->user()->permitted_ip) {
+                Auth::guard('admin')->logout();
                 return redirect()
                     ->back()
                     ->with('invalidLogin', __('auth.invalid_ip'))
