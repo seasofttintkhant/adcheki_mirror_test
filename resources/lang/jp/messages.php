@@ -14,7 +14,7 @@ return [
     'edit_domain' => 'ドメインを編集',
     'email' => 'メアド',
     'add_email' => 'メールアドレスの追加',
-    'emails_list' => 'トメールアドレスの一覧',
+    'emails_list' => 'メールアドレスの一覧',
     'edit_email' => 'メールを編集',
     'operator' => 'オペレータ',
     'add_operator' => 'オペレータの追加',

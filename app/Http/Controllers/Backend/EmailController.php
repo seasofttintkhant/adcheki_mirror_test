@@ -50,7 +50,7 @@ class EmailController extends Controller
             'status' => $request->status,
         ]);
 
-        return redirect(route('emails.index'))->with('success', 'An email is added.');
+        return redirect(route('emails.index'))->with('success', 'The email has been added.');
     }
 
     /**
@@ -94,7 +94,7 @@ class EmailController extends Controller
             'status' => $request->status
         ]);
 
-        return redirect(route('emails.index'))->with('success', 'An email is updated.');
+        return redirect(route('emails.index'))->with('success', 'The email has been updated.');
     }
 
     /**
@@ -108,7 +108,7 @@ class EmailController extends Controller
         $email = Email::findOrFail($id);
         $this->authorize('remove', $email);
         $email->delete();
-        return redirect(route('emails.index'))->with('success', 'An email is removed.');
+        return response()->json(['status' => 'success', 'message' => 'The email has been removed.']);
     }
 
     public function search(EmailSearchRequest $request)

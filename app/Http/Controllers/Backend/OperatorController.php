@@ -48,7 +48,7 @@ class OperatorController extends Controller
             'role' => $request->role,
             'permitted_ip' => $request->permitted_ip
         ]);
-        return redirect(route('operators.index'))->with('success', 'An operator is added.');
+        return redirect(route('operators.index'))->with('success', 'The operator has been added.');
     }
 
     /**
@@ -90,7 +90,7 @@ class OperatorController extends Controller
             'role' => $request->role,
             'permitted_ip' => $request->permitted_ip
         ]);
-        return redirect(route('operators.index'))->with('success', 'An operator is updated.');
+        return redirect(route('operators.index'))->with('success', 'The operator has been updated.');
     }
 
     /**
@@ -102,7 +102,7 @@ class OperatorController extends Controller
     public function destroy($id)
     {
         Admin::destroy($id);
-        return redirect(route('operators.index'))->with('success', 'An operator is removed.');
+        return response()->json(['status' => 'success', 'message' => 'The operator has been removed.']);
     }
 
     public function search(Request $request)

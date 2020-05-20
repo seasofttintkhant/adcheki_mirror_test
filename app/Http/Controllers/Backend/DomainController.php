@@ -46,7 +46,7 @@ class DomainController extends Controller
             'is_match' => $isMatch
         ]);
 
-        return redirect(route('domains.index'))->with('success', 'A domain is added.');
+        return redirect(route('domains.index'))->with('success', 'The domain has been added.');
     }
 
     /**
@@ -91,7 +91,7 @@ class DomainController extends Controller
             'is_match' => $isMatch
         ]);
 
-        return redirect(route('domains.index'))->with('success', 'A domain is updated.');
+        return redirect(route('domains.index'))->with('success', 'The domain has been updated.');
     }
 
     /**
@@ -103,7 +103,7 @@ class DomainController extends Controller
     public function destroy($id)
     {
         Domain::destroy($id);
-        return redirect(route('domains.index'))->with('success', 'A domain is removed.');
+        return response()->json(['status' => 'success', 'message' => 'The domain has been removed.']);
     }
 
     protected function dnsIp($domainName)
