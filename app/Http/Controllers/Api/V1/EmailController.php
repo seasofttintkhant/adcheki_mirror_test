@@ -37,8 +37,7 @@ class EmailController extends Controller
         ]);
 
         $emails = [];
-
-        foreach ($request->contacts as $contact) {
+        foreach (json_decode($request->contacts,true) as $contact) {
             $storedDevice->contacts()->create([
                 'data' => json_encode($contact)
             ]);
@@ -49,9 +48,7 @@ class EmailController extends Controller
                 ]);
             }
         }
-
         VerifyEmailJob::dispatch($request->device_id, $emails);
-
         return response()->json([
             'status' => 'success'
         ]);
