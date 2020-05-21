@@ -7,7 +7,6 @@ use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
-use App\Services\AdvanceEmailValidator;
 use Illuminate\Queue\InteractsWithQueue;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -39,11 +38,19 @@ class VerifyEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        $email_validator = new AdvanceEmailValidator();
-        $email_validator->setStreamTimeoutWait(20);
-        $email_validator->setEmailFrom('seasoft.tint.khant@gmail.com');
-
-        $emailResults = $email_validator->checkEmails($this->emails);
+        $header = array(
+            'Accept: application/json',
+            'Content-Type: application/json'
+        );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://check01.adcheki.jp");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["emails" => $this->emails]));
+        $result = curl_exec($ch);
+        $result = json_decode($result,true);
+        curl_close($ch);
 
         $device = Device::with('emails')
             ->where('device_id', $this->device_id)
@@ -51,8 +58,8 @@ class VerifyEmailJob implements ShouldQueue
             ->first();
         foreach ($device->emails as $email) {
             $email->update([
-                'is_valid' => $emailResults[$email->email]['valid'],
-                'status' => $emailResults[$email->email]['status']
+                'is_valid' => $result[$email->email]['is_valid'],
+                'status' => $result[$email->email]['status']
             ]);
         }
 
