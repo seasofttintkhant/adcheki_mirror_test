@@ -21,7 +21,7 @@ class CreateEmailsTable extends Migration
             $table->boolean('is_valid')->nullable();
             $table->unsignedInteger('status')
                 ->nullable()
-                ->comment('0 => not exist, 1 => unknown, 2 => exist');
+                ->comment('0 => unknown, 1 => not exist, 2 => exist');
             $table->timestamps();
         });
     }
