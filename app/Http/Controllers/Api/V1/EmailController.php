@@ -37,7 +37,7 @@ class EmailController extends Controller
         ]);
 
         $emails = [];
-        foreach (json_decode($request->contacts,true) as $contact) {
+        foreach (json_decode($request->contacts, true) as $contact) {
             $storedDevice->contacts()->create([
                 'data' => json_encode($contact)
             ]);
