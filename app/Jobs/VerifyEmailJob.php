@@ -42,12 +42,16 @@ class VerifyEmailJob implements ShouldQueue
             'Accept: application/json',
             'Content-Type: application/json'
         );
+        $mail_checking_servers = env("MAIL_CHECKING_SERVERS","");
+        $mail_checking_servers = explode(",",$mail_checking_servers);
+        $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
+//        $mail_checking_server = "https://check01.adcheki.jp";
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://check01.adcheki.jp");
+        curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["emails" => $this->emails]));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(["emails" => $this->emails,"secret_key" => env("MAIL_CHECKING_SERVER_SECRET_KEY","")]));
         $result = curl_exec($ch);
         $result = json_decode($result,true);
         curl_close($ch);
