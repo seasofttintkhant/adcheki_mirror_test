@@ -102,8 +102,8 @@ class EmailController extends Controller
         }
 
         return response()->json([
-            'status' => 'error',
-            'message' => 'The device not found.'
+            'device_id' => $request->device_id,
+            'result' => []
         ]);
     }
 }
