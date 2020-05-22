@@ -106,4 +106,41 @@ class EmailController extends Controller
             'result' => []
         ]);
     }
+
+    public function individualCheck(Request $request)
+    {
+        $emails = explode(',', $request->emails);
+
+        $header = [
+            'Accept: application/json',
+            'Content-Type: application/json'
+        ];
+        $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
+        $mail_checking_servers = explode(',', $mail_checking_servers);
+        $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
+        $mail_checking_server = 'https://check01.adcheki.jp';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'emails' => $emails,
+            'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
+        ]));
+        $result = curl_exec($ch);
+        $result = json_decode($result, true);
+        curl_close($ch);
+
+        $newResult = [];
+        foreach ($result as $key => $value) {
+            $newResult[] = [
+                'email' => $key,
+                'valid' => $value['is_valid'] ? true : false,
+                'exist' => $value['status'] == 2
+            ];
+        }
+
+        return ['result' => $newResult];
+    }
 }

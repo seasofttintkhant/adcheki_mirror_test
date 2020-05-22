@@ -79,9 +79,11 @@ class VerifyEmailJob implements ShouldQueue
         $endPoint = config('services.push_noti.endpoint');
         $message = [
             'to' => $fcmToken,
-            'data' => [
+            'notification' => [
                 'title' => 'Complete',
                 'body' => 'Email checking has been completed.',
+            ],
+            'data' => [
                 'type' => 'completed_checking'
             ]
         ];
