@@ -13,11 +13,17 @@ class DeviceController extends Controller
         $device = Device::where('device_id', $request->device_id)
             ->latest('id')
             ->first();
-        $device->update([
-            'fcm_token' => $request->fcm_token
-        ]);
+        if ($device) {
+            $device->update([
+                'fcm_token' => $request->fcm_token
+            ]);
+            return response()->json([
+                'status' => 'success'
+            ]);
+        }
         return response()->json([
-            'status' => 'success'
+            'status' => 'error',
+            'message' => 'The device not found.'
         ]);
     }
 }
