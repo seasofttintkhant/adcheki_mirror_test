@@ -157,8 +157,6 @@ class EmailController extends Controller
             $emails = explode(',', $request->emails);
             $device->emails()->whereIn('email', $emails)->delete();
 
-            $device = $device->refresh();
-
             return response()->json(['status' => 'success']);
         }
 
