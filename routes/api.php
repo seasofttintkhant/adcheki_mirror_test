@@ -20,6 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::prefix('v1')->group(function () {
     Route::get('email/results', 'EmailController@getResults')->name('emails.results');
     Route::post('emails/individual-check', 'EmailController@individualCheck');
+    Route::post('emails/delete', 'EmailController@deleteEmails');
     Route::apiResource('emails', 'EmailController');
     Route::post('update-token', 'DeviceController@updateFcmToken');
 });

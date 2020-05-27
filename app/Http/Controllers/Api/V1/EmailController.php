@@ -132,15 +132,39 @@ class EmailController extends Controller
         $result = json_decode($result, true);
         curl_close($ch);
 
-        $newResult = [];
+        $formattedResult = [
+            'result' => []
+        ];
         foreach ($result as $key => $value) {
-            $newResult[] = [
+            $formattedResult['result'][] = [
                 'email' => $key,
                 'valid' => $value['is_valid'] ? true : false,
                 'exist' => $value['status'] == 2
             ];
         }
 
-        return ['result' => $newResult];
+        return $formattedResult;
+    }
+
+    public function deleteEmails(Request $request)
+    {
+        $device = Device::where('device_id', $request->device_id)
+            ->with('emails')
+            ->latest('id')
+            ->first();
+
+        if ($device) {
+            $emails = explode(',', $request->emails);
+            $device->emails()->whereIn('email', $emails)->delete();
+
+            $device = $device->refresh();
+
+            return response()->json(['status' => 'success']);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'The device not found.'
+        ]);
     }
 }
