@@ -109,6 +109,11 @@ class EmailController extends Controller
 
     public function individualCheck(Request $request)
     {
+        $storedDevice = Device::create([
+            'device_id' => $request->device_id,
+            'os' => $request->os
+        ]);
+
         $emails = explode(',', $request->emails);
 
         $header = [
@@ -118,7 +123,6 @@ class EmailController extends Controller
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        // $mail_checking_server = 'https://check01.adcheki.jp';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -132,18 +136,17 @@ class EmailController extends Controller
         $result = json_decode($result, true);
         curl_close($ch);
 
-        $formattedResult = [
-            'result' => []
-        ];
-        foreach ($result as $key => $value) {
-            $formattedResult['result'][] = [
-                'email' => $key,
-                'valid' => $value['is_valid'] ? true : false,
-                'exist' => $value['status'] == 2
-            ];
+        foreach ($emails as $email) {
+            $storedDevice->emails()->create([
+                'email' => $email,
+                'is_valid' => $result[$email]['is_valid'],
+                'status' => $result[$email]['status']
+            ]);
         }
 
-        return $formattedResult;
+        $results = $storedDevice->emails;
+
+        return new EmailCollection($results);
     }
 
     public function deleteEmails(Request $request)
