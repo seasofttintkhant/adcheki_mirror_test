@@ -48,7 +48,9 @@ class EmailController extends Controller
                 ]);
             }
         }
+
         VerifyEmailJob::dispatch($request->device_id, $emails);
+
         return response()->json([
             'status' => 'success'
         ]);
@@ -145,6 +147,9 @@ class EmailController extends Controller
         }
 
         $results = $storedDevice->emails;
+
+        $storedDevice->is_checked = true;
+        $storedDevice->save();
 
         return new EmailCollection($results);
     }
