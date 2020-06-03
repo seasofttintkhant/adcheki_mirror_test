@@ -33,7 +33,8 @@ class EmailController extends Controller
         $storedDevice = Device::create([
             'device_id' => $request->device_id,
             'fcm_token' => $request->fcm_token,
-            'os' => $request->os
+            'os' => $request->os,
+            'is_bulk' => true
         ]);
 
         $emails = [];
@@ -94,6 +95,7 @@ class EmailController extends Controller
     {
         $device = Device::where('device_id', $request->device_id)
             ->where('is_checked', 1)
+            ->where('is_bulk', 1)
             ->with('emails')
             ->latest()
             ->first();
@@ -113,7 +115,8 @@ class EmailController extends Controller
     {
         $storedDevice = Device::create([
             'device_id' => $request->device_id,
-            'os' => $request->os
+            'os' => $request->os,
+            'is_bulk' => false
         ]);
 
         $emails = explode(',', $request->emails);

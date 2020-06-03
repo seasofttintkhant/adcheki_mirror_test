@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
-    protected $fillable = ['device_id', 'fcm_token', 'os', 'is_checked'];
+    protected $fillable = ['device_id', 'fcm_token', 'os', 'is_checked', 'is_bulk'];
 
     public function contacts()
     {
