@@ -16,7 +16,8 @@ class EmailCollection extends ResourceCollection
     {
         return [
             'device_id' => $request->device_id,
-            'result' => EmailResource::collection($this->collection)
+            'result' => EmailResource::collection($this->collection),
+            'created_at' => $this->collection[0]->device->updated_at->format('Y-m-d H:i:s')
         ];
     }
 }
