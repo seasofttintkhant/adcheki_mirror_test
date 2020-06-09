@@ -97,7 +97,7 @@ class EmailController extends Controller
             ->where('is_checked', 1)
             ->where('is_bulk', 1)
             ->with('emails')
-            ->latest()
+            ->latest('id')
             ->first();
 
         if ($device) {
