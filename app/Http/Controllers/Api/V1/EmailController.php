@@ -160,14 +160,15 @@ class EmailController extends Controller
 
     public function deleteEmails(Request $request)
     {
-        $device = Device::where('device_id', $request->device_id)
+        $devices = Device::where('device_id', $request->device_id)
             ->with('emails')
-            ->latest('id')
-            ->first();
+            ->get();
 
-        if ($device) {
+        if ($devices) {
             $emails = explode(',', $request->emails);
-            $device->emails()->whereIn('email', $emails)->delete();
+            foreach ($devices as $device) {
+                $device->emails()->whereIn('email', $emails)->delete();
+            }
 
             return response()->json(['status' => 'success']);
         }
