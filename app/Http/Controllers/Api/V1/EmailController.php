@@ -102,28 +102,30 @@ class EmailController extends Controller
             ->latest('id')
             ->get();
 
-        if ($devices[0] && !$devices[0]->is_checked) {
-            $oldDevice = $devices[1];
-            if ($oldDevice) {
-                $results = $oldDevice->emails;
+        if (count($devices) > 0) {
+            if ($devices[0] && !$devices[0]->is_checked) {
+                $oldDevice = $devices[1];
+                if ($oldDevice) {
+                    $results = $oldDevice->emails;
+                    return new EmailCollection($results);
+                }
+                return response()->json([
+                    'device_id' => $request->device_id,
+                    'created_at' => $devices[0]->updated_at->format('Y-m-d H:i:s'),
+                    'in_process' => !$devices[0]->is_checked,
+                    'result' => []
+                ]);
+            }
+
+            if ($devices[0] && $devices[0]->is_checked) {
+                $results = $devices[0]->emails;
                 return new EmailCollection($results);
             }
-            return response()->json([
-                'device_id' => $request->device_id,
-                'created_at' => $devices[0]->updated_at->format('Y-m-d H:i:s'),
-                'in_process' => false,
-                'result' => []
-            ]);
-        }
-
-        if ($devices[0] && $devices[0]->is_checked) {
-            $results = $devices[0]->emails;
-            return new EmailCollection($results);
         }
 
         return response()->json([
             'device_id' => $request->device_id,
-            'created_at' => $devices[0]->updated_at->format('Y-m-d H:i:s'),
+            'created_at' => now()->format('Y-m-d H:m:i'),
             'in_process' => false,
             'result' => []
         ]);
