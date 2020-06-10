@@ -10,8 +10,6 @@ use App\Http\Resources\EmailCollection;
 
 class EmailController extends Controller
 {
-    const INITIAL_ID = 1000000000;
-
     /**
      * Display a listing of the resource.
      *
@@ -30,6 +28,11 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
+        // $storedDevice = Device::updateOrCreate(
+        //     ['device_id' => $request->device_id],
+        //     ['fcm_token' => $request->fcm_token, 'os' => $request->os, 'is_bulk' => true]
+        // );
+
         $storedDevice = Device::create([
             'device_id' => $request->device_id,
             'fcm_token' => $request->fcm_token,
@@ -94,7 +97,6 @@ class EmailController extends Controller
     public function getResults(Request $request)
     {
         $device = Device::where('device_id', $request->device_id)
-            ->where('is_checked', 1)
             ->where('is_bulk', 1)
             ->with('emails')
             ->latest('id')
@@ -113,6 +115,11 @@ class EmailController extends Controller
 
     public function individualCheck(Request $request)
     {
+        // $storedDevice = Device::updateOrCreate(
+        //     ['device_id' => $request->device_id],
+        //     ['os' => $request->os, 'is_bulk' => false]
+        // );
+
         $storedDevice = Device::create([
             'device_id' => $request->device_id,
             'os' => $request->os,

@@ -25,7 +25,7 @@ class Email extends Model
     {
         parent::boot();
         static::created(function ($email) {
-            $email->mail_address_id = self::INITIAL_ID + $email->id;
+            $email->mail_address_id = $email->id > self::INITIAL_ID ? $email->id : self::INITIAL_ID + $email->id;
             $email->save();
         });
     }

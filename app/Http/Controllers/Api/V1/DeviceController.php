@@ -10,9 +10,15 @@ class DeviceController extends Controller
 {
     public function updateFcmToken(Request $request)
     {
+        // $device = Device::updateOrCreate(
+        //     ['device_id' => $request->device_id],
+        //     ['fcm_token' => $request->fcm_token]
+        // );
+
         $device = Device::where('device_id', $request->device_id)
             ->latest('id')
             ->first();
+
         if ($device) {
             $device->update([
                 'fcm_token' => $request->fcm_token
