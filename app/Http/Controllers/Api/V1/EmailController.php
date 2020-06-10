@@ -96,33 +96,35 @@ class EmailController extends Controller
 
     public function getResults(Request $request)
     {
-        $device = Device::where('device_id', $request->device_id)
+        $devices = Device::where('device_id', $request->device_id)
             ->where('is_bulk', 1)
             ->with('emails')
             ->latest('id')
-            ->first();
+            ->get();
 
-        if ($device && !$device->is_checked) {
-            $oldDevice = Device::with('emails')->where('is_bulk', 1)->find($device->id - 1);
+        if ($devices[0] && !$devices[0]->is_checked) {
+            $oldDevice = $devices[1];
             if ($oldDevice) {
                 $results = $oldDevice->emails;
                 return new EmailCollection($results);
             }
             return response()->json([
                 'device_id' => $request->device_id,
-                'created_at' => $device->updated_at->format('Y-m-d H:i:s'),
+                'created_at' => $devices[0]->updated_at->format('Y-m-d H:i:s'),
                 'in_process' => false,
                 'result' => []
             ]);
         }
 
-        if ($device && $device->is_checked) {
-            $results = $device->emails;
+        if ($devices[0] && $devices[0]->is_checked) {
+            $results = $devices[0]->emails;
             return new EmailCollection($results);
         }
 
         return response()->json([
             'device_id' => $request->device_id,
+            'created_at' => $devices[0]->updated_at->format('Y-m-d H:i:s'),
+            'in_process' => false,
             'result' => []
         ]);
     }
