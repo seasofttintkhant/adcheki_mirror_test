@@ -102,7 +102,21 @@ class EmailController extends Controller
             ->latest('id')
             ->first();
 
-        if ($device) {
+        if ($device && !$device->is_checked) {
+            $oldDevice = Device::with('emails')->where('is_bulk', 1)->find($device->id - 1);
+            if ($oldDevice) {
+                $results = $oldDevice->emails;
+                return new EmailCollection($results);
+            }
+            return response()->json([
+                'device_id' => $request->device_id,
+                'created_at' => $device->updated_at->format('Y-m-d H:i:s'),
+                'in_process' => false,
+                'result' => []
+            ]);
+        }
+
+        if ($device && $device->is_checked) {
             $results = $device->emails;
             return new EmailCollection($results);
         }
