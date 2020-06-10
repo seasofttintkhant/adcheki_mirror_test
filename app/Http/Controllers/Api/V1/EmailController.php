@@ -7,6 +7,7 @@ use App\Jobs\VerifyEmailJob;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailCollection;
+use App\Http\Resources\OldEmailCollection;
 
 class EmailController extends Controller
 {
@@ -107,7 +108,7 @@ class EmailController extends Controller
                 if (count($devices) > 1) {
                     $oldDevice = $devices[1];
                     $results = $oldDevice->emails;
-                    return new EmailCollection($results);
+                    return new OldEmailCollection($results);
                 }
                 return response()->json([
                     'device_id' => $request->device_id,
