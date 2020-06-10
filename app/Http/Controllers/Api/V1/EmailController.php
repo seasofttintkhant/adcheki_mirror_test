@@ -104,7 +104,7 @@ class EmailController extends Controller
 
         if (count($devices) > 0) {
             if ($devices[0] && !$devices[0]->is_checked) {
-                if (count($devices > 1)) {
+                if (count($devices) > 1) {
                     $oldDevice = $devices[1];
                     $results = $oldDevice->emails;
                     return new EmailCollection($results);
