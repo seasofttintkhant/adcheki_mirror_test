@@ -29,6 +29,16 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
+        $contacts = json_decode($request->contacts, true);
+        if ($request->device_id === null
+        || $request->fcm_token === null
+        || $request->os === null
+        || $contacts === null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid request format.'
+            ]);
+        }
         // $storedDevice = Device::updateOrCreate(
         //     ['device_id' => $request->device_id],
         //     ['fcm_token' => $request->fcm_token, 'os' => $request->os, 'is_bulk' => true]
