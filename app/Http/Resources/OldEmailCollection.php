@@ -17,7 +17,6 @@ class OldEmailCollection extends ResourceCollection
         return [
             'device_id' => $request->device_id,
             'created_at' => $this->collection[0]->device->updated_at->format('Y-m-d H:i:s'),
-            'in_process' => true,
             'result' => EmailResource::collection($this->collection)
         ];
     }
