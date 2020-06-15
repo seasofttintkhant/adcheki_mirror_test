@@ -56,19 +56,14 @@ class VerifyEmailJob implements ShouldQueue
         $result = json_decode($result, true);
         curl_close($ch);
 
-        $device = Device::with('emails')
-            ->where('device_id', $this->device_id)
-            ->latest('id')
-            ->first();
+        $device = Device::with('emails')->findOrFail($this->device_id);
 
-        $device->emails()->chunk(50, function ($emails) use ($result) {
-            foreach ($emails as $email) {
-                $email->update([
-                    'is_valid' => $result[$email->email]['is_valid'],
-                    'status' => $result[$email->email]['status']
-                ]);
-            }
-        });
+        foreach ($device->emails as $email) {
+            $email->update([
+                'is_valid' => $result[$email->email]['is_valid'],
+                'status' => $result[$email->email]['status']
+            ]);
+        }
 
         $this->pushNotiToDevice($device->fcm_token);
 

@@ -64,7 +64,7 @@ class EmailController extends Controller
             }
         }
 
-        VerifyEmailJob::dispatch($request->device_id, $emails);
+        VerifyEmailJob::dispatch($storedDevice->id, $emails);
 
         return response()->json([
             'status' => 'success'
