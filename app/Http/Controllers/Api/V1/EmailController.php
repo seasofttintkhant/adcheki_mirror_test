@@ -212,4 +212,35 @@ class EmailController extends Controller
             'message' => 'The device not found.'
         ]);
     }
+
+    public function resultsStatus(Request $request)
+    {
+        if ($request->device_id === null) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid request format.'
+            ]);
+        }
+
+        if ($request->status == 200) {
+            $device = Device::latest('id')->firstWhere('device_id', $request->device_id);
+            if ($device === null) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The device not found.'
+                ]);
+            }
+
+            $device->delete();
+
+            return response()->json([
+                'status' => 'success'
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'The device cannot be deleted.'
+        ]);
+    }
 }
