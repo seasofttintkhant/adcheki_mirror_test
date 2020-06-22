@@ -175,7 +175,7 @@ class EmailController extends Controller
         }
 
         if ($request->status == 200) {
-            $device = Device::with(['contacts, emails'])->firstWhere('device_id', $request->device_id);
+            $device = Device::with(['contacts', 'emails'])->firstWhere('device_id', $request->device_id);
             if ($device === null) {
                 return response()->json([
                     'status' => 'error',
@@ -202,9 +202,10 @@ class EmailController extends Controller
             curl_close($ch);
 
             if ($result['status'] === 'success') {
-                $results = Email::with('device')->where('device_id', $device->id)->get();
                 $device->delete();
-                return new EmailCollection($results);
+                return response()->json([
+                    'status' => 'success'
+                ]);
             }
 
             return response()->json([
