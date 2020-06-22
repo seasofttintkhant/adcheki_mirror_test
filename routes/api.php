@@ -18,10 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1')->group(function () {
-    Route::get('email/results', 'EmailController@getResults')->name('emails.results');
-    Route::post('email/results/status', 'EmailController@resultsStatus');
+    Route::post('emails', 'EmailController@store');
     Route::post('emails/individual-check', 'EmailController@individualCheck');
-    Route::post('emails/delete', 'EmailController@deleteEmails');
-    Route::apiResource('emails', 'EmailController');
     Route::post('update-token', 'DeviceController@updateFcmToken');
+    Route::get('email/results', 'EmailController@getResults');
 });
