@@ -22,4 +22,5 @@ Route::prefix('v1')->group(function () {
     Route::post('emails/individual-check', 'EmailController@individualCheck');
     Route::post('update-token', 'DeviceController@updateFcmToken');
     Route::get('email/results', 'EmailController@getResults');
+    Route::post('email/results/status', 'EmailController@resultsStatus');
 });

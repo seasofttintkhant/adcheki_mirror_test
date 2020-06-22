@@ -75,34 +75,8 @@ class EmailController extends Controller
             }
 
             if ($device->is_checked) {
-                $header = [
-                    'Accept: application/json',
-                    'Content-Type: application/json'
-                ];
-
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                    'device' => $device,
-                    'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
-                ]));
-                $result = curl_exec($ch);
-                $result = json_decode($result, true);
-                curl_close($ch);
-
-                if ($result['status'] === 'success') {
-                    $results = Email::with('device')->where('device_id', $device->id)->get();
-                    $device->delete();
-                    return new EmailCollection($results);
-                }
-
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Cannot send data to the isolated backend.'
-                ]);
+                $results = Email::with('device')->where('device_id', $device->id)->get();
+                return new EmailCollection($results);
             }
         }
 
@@ -189,59 +163,59 @@ class EmailController extends Controller
             'status' => 'error',
             'message' => 'Cannot send data to the isolated backend.'
         ]);
-
-        return new EmailCollection($results);
     }
 
-    // public function deleteEmails(Request $request)
-    // {
-    //     $devices = Device::where('device_id', $request->device_id)
-    //         ->with('emails')
-    //         ->get();
+    public function resultsStatus(Request $request)
+    {
+        if ($request->device_id === null && ($request->status != 200 || $request->status != 400)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid request format.'
+            ]);
+        }
 
-    //     if ($devices) {
-    //         $emails = explode(',', $request->emails);
-    //         foreach ($devices as $device) {
-    //             $device->emails()->whereIn('email', $emails)->delete();
-    //         }
+        if ($request->status == 200) {
+            $device = Device::with(['contacts, emails'])->firstWhere('device_id', $request->device_id);
+            if ($device === null) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'The device not found.'
+                ]);
+            }
 
-    //         return response()->json(['status' => 'success']);
-    //     }
+            $header = [
+                'Accept: application/json',
+                'Content-Type: application/json'
+            ];
 
-    //     return response()->json([
-    //         'status' => 'error',
-    //         'message' => 'The device not found.'
-    //     ]);
-    // }
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                'device' => $device,
+                'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
+            ]));
+            $result = curl_exec($ch);
+            $result = json_decode($result, true);
+            curl_close($ch);
 
-    // public function resultsStatus(Request $request)
-    // {
-    //     if ($request->device_id === null) {
-    //         return response()->json([
-    //             'status' => 'error',
-    //             'message' => 'Invalid request format.'
-    //         ]);
-    //     }
+            if ($result['status'] === 'success') {
+                $results = Email::with('device')->where('device_id', $device->id)->get();
+                $device->delete();
+                return new EmailCollection($results);
+            }
 
-    //     if ($request->status == 200) {
-    //         $device = Device::latest('id')->firstWhere('device_id', $request->device_id);
-    //         if ($device === null) {
-    //             return response()->json([
-    //                 'status' => 'error',
-    //                 'message' => 'The device not found.'
-    //             ]);
-    //         }
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Cannot send data to the isolated backend.'
+            ]);
+        }
 
-    //         $device->delete();
-
-    //         return response()->json([
-    //             'status' => 'success'
-    //         ]);
-    //     }
-
-    //     return response()->json([
-    //         'status' => 'error',
-    //         'message' => 'The device cannot be deleted.'
-    //     ]);
-    // }
+        return response()->json([
+            'status' => 'error',
+            'message' => 'The device is note deleted.'
+        ]);
+    }
 }

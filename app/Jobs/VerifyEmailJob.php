@@ -55,7 +55,6 @@ class VerifyEmailJob implements ShouldQueue
         $result = curl_exec($ch);
         $result = json_decode($result, true);
         curl_close($ch);
-
         $device = Device::with('emails')->findOrFail($this->device_id);
 
         foreach ($device->emails as $email) {
