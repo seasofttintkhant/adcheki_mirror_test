@@ -102,10 +102,10 @@ class VerifyEmailJob implements ShouldQueue
             if ($response->success) {
                 return true;
             }
-            Log::error('Push noti errors:' . $response);
+            Log::error('Push Noti Errors:' . $response);
             return false;
         } catch (GuzzleException $error) {
-            Log::error('Push noti errors ' . $error);
+            Log::error('Guzzle Errors: ' . $error);
             return false;
         }
     }
