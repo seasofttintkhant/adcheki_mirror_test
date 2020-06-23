@@ -55,6 +55,7 @@ class VerifyEmailJob implements ShouldQueue
         $result = curl_exec($ch);
         $result = json_decode($result, true);
         curl_close($ch);
+
         $device = Device::with('emails')->findOrFail($this->device_id);
 
         foreach ($device->emails as $email) {
@@ -101,7 +102,7 @@ class VerifyEmailJob implements ShouldQueue
             if ($response->success) {
                 return true;
             }
-            Log::error('Push noti errors.');
+            Log::error('Push noti errors:' . $response);
             return false;
         } catch (GuzzleException $error) {
             Log::error('Push noti errors ' . $error);
