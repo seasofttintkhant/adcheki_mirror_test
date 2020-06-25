@@ -30,6 +30,11 @@ class EmailController extends Controller
             ]);
         }
 
+        if (Device::where('device_id', $request->device_id)->exists()) {
+            $existingDevice = Device::firstWhere('device_id', $request->device_id);
+            $existingDevice->delete();
+        }
+
         $storedDevice = Device::create([
             'device_id' => $request->device_id,
             'fcm_token' => $request->fcm_token,
