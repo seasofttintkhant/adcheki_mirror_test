@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use App\Models\Device;
 use Illuminate\Console\Command;
 
@@ -38,9 +39,41 @@ class SendToIsolatedBackend extends Command
      */
     public function handle()
     {
-        $devices = Device::where('updated_at', '>=', now())
+        $dueTime = Carbon::now()->subMinutes(10);
+        $dueDevices = Device::where('updated_at', '<=', $dueTime)
+            ->with(['contacts', 'emails'])
             ->where('is_checked', 1)
             ->get();
-        dd($devices);
+
+        $dueDevices->chunk(10, function ($devices) {
+            foreach ($devices as $device) {
+                $this->sendToIsolatedBackend($device);
+            }
+        });
+    }
+
+    public function sendToIsolatedBackend($device)
+    {
+        $header = [
+            'Accept: application/json',
+            'Content-Type: application/json'
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'device' => $device,
+            'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
+        ]));
+        $result = curl_exec($ch);
+        $result = json_decode($result, true);
+        curl_close($ch);
+
+        if ($result['status'] === 'success') {
+            $device->delete();
+        }
     }
 }

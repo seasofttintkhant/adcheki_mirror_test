@@ -41,7 +41,10 @@ class VerifyEmailJob implements ShouldQueue
         $checkedEmails = [];
 
         foreach (array_chunk($this->emails, 10) as $emails) {
-            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
+            if (Device::where('id', $this->device_id)->exists()) {
+                $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
+            }
+            break;
         }
 
         // $header = [
@@ -62,19 +65,21 @@ class VerifyEmailJob implements ShouldQueue
         // $result = json_decode($result, true);
         // curl_close($ch);
 
-        $device = Device::with('emails')->findOrFail($this->device_id);
+        $device = Device::latest()->with('emails')->findOrFail($this->device_id);
 
-        foreach ($device->emails as $email) {
-            $email->update([
-                'is_valid' => $checkedEmails[$email->email]['is_valid'],
-                'status' => $checkedEmails[$email->email]['status']
-            ]);
+        if ($device) {
+            foreach ($device->emails as $email) {
+                $email->update([
+                    'is_valid' => $checkedEmails[$email->email]['is_valid'],
+                    'status' => $checkedEmails[$email->email]['status']
+                ]);
+            }
+
+            $this->pushNotiToDevice($device->fcm_token);
+
+            $device->is_checked = true;
+            $device->save();
         }
-
-        $this->pushNotiToDevice($device->fcm_token);
-
-        $device->is_checked = true;
-        $device->save();
     }
 
     protected function pushNotiToDevice($fcmToken)
