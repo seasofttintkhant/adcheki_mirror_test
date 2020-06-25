@@ -63,6 +63,7 @@ class EmailController extends Controller
             ->with('contacts')
             ->with('emails')
             ->where('is_bulk', 1)
+            ->lastest()
             ->first();
 
         if ($device) {
@@ -175,7 +176,9 @@ class EmailController extends Controller
         }
 
         if ($request->status == 200) {
-            $device = Device::with(['contacts', 'emails'])->firstWhere('device_id', $request->device_id);
+            $device = Device::with(['contacts', 'emails'])
+                ->lastest()
+                ->firstWhere('device_id', $request->device_id);
             if ($device === null) {
                 return response()->json([
                     'status' => 'error',

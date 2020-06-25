@@ -38,30 +38,36 @@ class VerifyEmailJob implements ShouldQueue
      */
     public function handle()
     {
-        $header = [
-            'Accept: application/json',
-            'Content-Type: application/json'
-        ];
-        $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
-        $mail_checking_servers = explode(',', $mail_checking_servers);
-        $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        $mail_checking_server = 'https://check01.adcheki.jp';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['emails' => $this->emails, 'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')]));
-        $result = curl_exec($ch);
-        $result = json_decode($result, true);
-        curl_close($ch);
+        $checkedEmails = [];
+
+        foreach (array_chunk($this->emails, 10) as $emails) {
+            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
+        }
+
+        // $header = [
+        //     'Accept: application/json',
+        //     'Content-Type: application/json'
+        // ];
+        // $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
+        // $mail_checking_servers = explode(',', $mail_checking_servers);
+        // $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
+        // $mail_checking_server = 'https://check01.adcheki.jp';
+        // $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // curl_setopt($ch, CURLOPT_POST, true);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['emails' => $this->emails, 'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')]));
+        // $result = curl_exec($ch);
+        // $result = json_decode($result, true);
+        // curl_close($ch);
 
         $device = Device::with('emails')->findOrFail($this->device_id);
 
         foreach ($device->emails as $email) {
             $email->update([
-                'is_valid' => $result[$email->email]['is_valid'],
-                'status' => $result[$email->email]['status']
+                'is_valid' => $checkedEmails[$email->email]['is_valid'],
+                'status' => $checkedEmails[$email->email]['status']
             ]);
         }
 
@@ -108,5 +114,31 @@ class VerifyEmailJob implements ShouldQueue
             Log::error('Guzzle Errors: ' . $error);
             return false;
         }
+    }
+
+    public function checkEmails($emails)
+    {
+        $header = [
+            'Accept: application/json',
+            'Content-Type: application/json'
+        ];
+        $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
+        $mail_checking_servers = explode(',', $mail_checking_servers);
+        $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
+        $mail_checking_server = 'https://check01.adcheki.jp';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            'emails' => $emails,
+            'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
+        ]));
+        $result = curl_exec($ch);
+        $result = json_decode($result, true);
+        curl_close($ch);
+
+        return $result;
     }
 }
