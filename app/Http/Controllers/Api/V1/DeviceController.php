@@ -10,7 +10,7 @@ class DeviceController extends Controller
 {
     public function updateFcmToken(Request $request)
     {
-        $device = Device::lastest()->firstWhere('device_id', $request->device_id);
+        $device = Device::latest()->firstWhere('device_id', $request->device_id);
 
         if ($device) {
             $device->update([
