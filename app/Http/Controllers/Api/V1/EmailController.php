@@ -233,9 +233,17 @@ class EmailController extends Controller
         $device = Device::where('device_id', $request->device_id)
             ->where('is_checked', 1)
             ->first();
+
+        if (!$device) {
+            return response()->json([
+                'completed' => true,
+                'downloaded' => true
+            ]);
+        }
+
         return response()->json([
-            'completed' => $device ? true : false,
-            'downloaded' => $device ? false : true
+            'completed' => $device->is_checked ? true : false,
+            'downloaded' => $device->is_checked ? false : true
         ]);
     }
 }
