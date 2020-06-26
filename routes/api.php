@@ -23,5 +23,5 @@ Route::prefix('v1')->group(function () {
     Route::post('update-token', 'DeviceController@updateFcmToken');
     Route::get('email/results', 'EmailController@getResults');
     Route::post('email/results/status', 'EmailController@resultsStatus');
-    Route::post('email/completed', 'EmailController@completed');
+    Route::get('email/completed', 'EmailController@completed');
 });
