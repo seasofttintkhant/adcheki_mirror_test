@@ -41,12 +41,11 @@ class VerifyEmailJob implements ShouldQueue
         $checkedEmails = [];
 
         foreach (array_chunk($this->emails, 10) as $emails) {
-            if (Device::where('id', $this->device_id)->exists()) {
-                $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
+            if (!Device::where('id', $this->device_id)->exists()) {
+                break;
             }
-            break;
+            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
         }
-
         // $header = [
         //     'Accept: application/json',
         //     'Content-Type: application/json'

@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\SendToIsolatedBackend::class
     ];
 
     /**
@@ -27,8 +27,8 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')
         //          ->hourly();
 
-        // $schedule->command('devices:send')
-        //     ->everyTenMinutes();
+        $schedule->command('devices:send')
+            ->everyTenMinutes();
     }
 
     /**
