@@ -2,25 +2,23 @@
 
 namespace App\Console\Commands;
 
-use Carbon\Carbon;
-use App\Models\Device;
 use Illuminate\Console\Command;
 
-class SendToIsolatedBackend extends Command
+class SendToIsolatedBackendEvery10Mintues extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'devices:send';
+    protected $signature = 'devices:sendeverytenminutes';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Send devices that are not downloaded by the app every 10 mintues.';
+    protected $description = 'Send device data every 10 mintues to the isolated server.';
 
     /**
      * Create a new command instance.
@@ -39,9 +37,7 @@ class SendToIsolatedBackend extends Command
      */
     public function handle()
     {
-        $dueTime = Carbon::now()->subDay();
-        Device::where('updated_at', '<=', $dueTime)
-            ->with(['contacts', 'emails'])
+        Device::with(['contacts', 'emails'])
             ->where('is_checked', 1)
             ->chunk(10, function ($dueDevices) {
                 foreach ($dueDevices as $device) {

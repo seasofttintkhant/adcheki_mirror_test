@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\SendToIsolatedBackend::class
+        Commands\SendToIsolatedBackend::class,
+        Commands\SendToIsolatedBackendEvery10Mintues::class
     ];
 
     /**
@@ -28,6 +29,9 @@ class Kernel extends ConsoleKernel
         //          ->hourly();
 
         $schedule->command('devices:send')
+            ->everyTenMinutes();
+
+        $schedule->command('devices:sendeverytenminutes')
             ->everyTenMinutes();
     }
 
