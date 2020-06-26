@@ -228,9 +228,9 @@ class EmailController extends Controller
         ]);
     }
 
-    public function completed($device_id)
+    public function completed(Request $request)
     {
-        $device = Device::where('device_id', $device_id)
+        $device = Device::where('device_id', $request->device_id)
             ->where('is_checked', 1)
             ->first();
         return response()->json([
