@@ -227,4 +227,12 @@ class EmailController extends Controller
             'message' => 'The device is note deleted.'
         ]);
     }
+
+    public function completed(Request $request)
+    {
+        $device = Device::where('is_checked', 1)->where('device-id', $request->device_id)->first();
+        return response()->json([
+            'completed' => $device ? true : false
+        ]);
+    }
 }
