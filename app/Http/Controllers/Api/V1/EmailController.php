@@ -234,7 +234,8 @@ class EmailController extends Controller
             ->where('is_checked', 1)
             ->first();
         return response()->json([
-            'completed' => $device ? true : false
+            'completed' => $device ? true : false,
+            'downloaded' => $device ? false : true
         ]);
     }
 }
