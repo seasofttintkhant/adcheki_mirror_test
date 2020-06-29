@@ -59,9 +59,6 @@ class SendToIsolatedBackendEvery10Mintues extends Command
                         $result = curl_exec($ch);
                         $result = json_decode($result, true);
                         curl_close($ch);
-                        if ($result['status'] === 'success') {
-                            $device->delete();
-                        }
                     }
                 }
             });

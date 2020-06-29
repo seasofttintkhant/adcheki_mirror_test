@@ -230,9 +230,7 @@ class EmailController extends Controller
 
     public function completed(Request $request)
     {
-        $device = Device::where('device_id', $request->device_id)
-            ->where('is_checked', 1)
-            ->first();
+        $device = Device::where('device_id', $request->device_id)->first();
 
         if (!$device) {
             return response()->json([

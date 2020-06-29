@@ -74,10 +74,9 @@ class VerifyEmailJob implements ShouldQueue
                 ]);
             }
 
+            $this->pushNotiToDevice($device->fcm_token);
             $device->is_checked = true;
             $device->save();
-
-            $this->pushNotiToDevice($device->fcm_token);
         }
     }
 
