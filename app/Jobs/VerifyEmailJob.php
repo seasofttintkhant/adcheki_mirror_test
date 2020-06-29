@@ -87,8 +87,8 @@ class VerifyEmailJob implements ShouldQueue
         $message = [
             'to' => $fcmToken,
             'notification' => [
-                'title' => 'Complete',
-                'body' => 'Email checking has been completed.',
+                'title' => 'メールアドレス存在確認完了',
+                'body' => 'メールアドレス存在確認が完了しました。アプリを開いて結果を取得してください。',
             ],
             'data' => [
                 'type' => 'completed_checking'
