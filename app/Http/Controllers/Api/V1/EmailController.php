@@ -235,7 +235,7 @@ class EmailController extends Controller
         if (!$device) {
             return response()->json([
                 'completed' => true,
-                'downloaded' => false
+                'downloaded' => true
             ]);
         }
 
