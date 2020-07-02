@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Device;
 use Illuminate\Console\Command;
 
 class SendToIsolatedBackendEvery10Mintues extends Command
