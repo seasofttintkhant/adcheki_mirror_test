@@ -21,15 +21,18 @@ class VerifyEmailJob implements ShouldQueue
 
     protected $emails;
 
+    protected $audit_id;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($device_id, array $emails)
+    public function __construct($device_id, array $emails, $audit_id)
     {
         $this->device_id = $device_id;
         $this->emails = $emails;
+        $this->audit_id = $audit_id;
     }
 
     /**
@@ -61,13 +64,8 @@ class VerifyEmailJob implements ShouldQueue
 
             $this->pushNotiToDevice($device->fcm_token);
 
-            Audit::create([
-                'device_id' => $device->device_id,
-                'os' => $device->os,
-                'total_email_received' => $device->emails()->count(),
-                'email_received_date' => $device->created_at,
-                'result_pushed_date' => now()
-            ]);
+            $audit = Audit::findOrFail($this->audit_id);
+            $audit->update(['result_pushed_date' => now()]);
 
             $device->is_checked = true;
             $device->save();

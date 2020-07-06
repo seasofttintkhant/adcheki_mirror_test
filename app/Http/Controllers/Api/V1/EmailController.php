@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Models\Audit;
 use App\Models\Email;
 use App\Models\Device;
 use Illuminate\Support\Str;
@@ -64,7 +65,14 @@ class EmailController extends Controller
             }
         }
 
-        VerifyEmailJob::dispatch($storedDevice->id, $emails);
+        $audit = Audit::create([
+            'device_id' => $storedDevice->device_id,
+            'os' => $storedDevice->os,
+            'total_email_received' => $storedDevice->emails()->count(),
+            'email_received_date' => $storedDevice->emails[$storedDevice->emails()->count() - 1]->created_at
+        ]);
+
+        VerifyEmailJob::dispatch($storedDevice->id, $emails, $audit->id);
 
         return response()->json([
             'status' => 'success'
