@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Email;
 use App\Models\Device;
+use Illuminate\Support\Str;
 use App\Jobs\VerifyEmailJob;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -48,10 +49,18 @@ class EmailController extends Controller
                 'data' => json_encode($contact)
             ]);
             foreach ($contact['emails'] as $email) {
-                array_push($emails, $email);
-                $storedDevice->emails()->create([
-                    'email' => $email,
-                ]);
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    array_push($emails, Str::lower($email));
+                    $storedDevice->emails()->create([
+                        'email' => Str::lower($email),
+                    ]);
+                } else {
+                    $storedDevice->emails()->create([
+                        'email' => Str::lower($email) . '@junk',
+                        'is_valid' => 0,
+                        'status' => 1
+                    ]);
+                }
             }
         }
 
@@ -96,6 +105,10 @@ class EmailController extends Controller
     public function individualCheck(Request $request)
     {
         $emails = explode(',', $request->emails);
+        $lowerCaseEmails = [];
+        foreach ($emails as $email) {
+            $lowerCaseEmails[] = Str::lower($email);
+        }
 
         $header = [
             'Accept: application/json',
@@ -112,7 +125,7 @@ class EmailController extends Controller
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-            'emails' => $emails,
+            'emails' => $lowerCaseEmails,
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
         ]));
         $result = curl_exec($ch);
@@ -120,7 +133,7 @@ class EmailController extends Controller
         curl_close($ch);
 
         $deviceEmails = [];
-        foreach ($emails as $email) {
+        foreach ($lowerCaseEmails as $email) {
             $deviceEmails[] = [
                 'email' => $email,
                 'is_valid' => $result[$email]['is_valid'],

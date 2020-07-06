@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Audit;
 use App\Models\Device;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -46,34 +47,28 @@ class VerifyEmailJob implements ShouldQueue
             }
             $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
         }
-        // $header = [
-        //     'Accept: application/json',
-        //     'Content-Type: application/json'
-        // ];
-        // $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
-        // $mail_checking_servers = explode(',', $mail_checking_servers);
-        // $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        // $mail_checking_server = 'https://check01.adcheki.jp';
-        // $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
-        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        // curl_setopt($ch, CURLOPT_POST, true);
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['emails' => $this->emails, 'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')]));
-        // $result = curl_exec($ch);
-        // $result = json_decode($result, true);
-        // curl_close($ch);
 
         $device = Device::latest()->with('emails')->findOrFail($this->device_id);
         if ($device) {
             foreach ($device->emails as $email) {
-                $email->update([
-                    'is_valid' => $checkedEmails[$email->email]['is_valid'],
-                    'status' => $checkedEmails[$email->email]['status']
-                ]);
+                if (isset($checkedEmails[$email->email])) {
+                    $email->update([
+                        'is_valid' => $checkedEmails[$email->email]['is_valid'],
+                        'status' => $checkedEmails[$email->email]['status']
+                    ]);
+                }
             }
 
             $this->pushNotiToDevice($device->fcm_token);
+
+            Audit::create([
+                'device_id' => $device->device_id,
+                'os' => $device->os,
+                'total_email_received' => $device->emails()->count(),
+                'email_received_date' => $device->created_at,
+                'result_pushed_date' => now()
+            ]);
+
             $device->is_checked = true;
             $device->save();
         }
