@@ -44,7 +44,7 @@ class VerifyEmailJob implements ShouldQueue
     {
         $checkedEmails = [];
 
-        foreach (array_chunk($this->emails, 10) as $emails) {
+        foreach (array_chunk($this->emails, 100) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }

@@ -43,7 +43,7 @@ class SendToIsolatedBackend extends Command
         Device::where('updated_at', '<=', $dueTime)
             ->with(['contacts', 'emails'])
             ->where('is_checked', 1)
-            ->chunk(10, function ($dueDevices) {
+            ->chunk(100, function ($dueDevices) {
                 foreach ($dueDevices as $device) {
                     if ($device !== null) {
                         $header = [
