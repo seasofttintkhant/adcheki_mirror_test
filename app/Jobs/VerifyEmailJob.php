@@ -44,7 +44,7 @@ class VerifyEmailJob implements ShouldQueue
     {
         $checkedEmails = [];
 
-        foreach (array_chunk($this->emails, 100) as $emails) {
+        foreach (array_chunk($this->emails, 50) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }
@@ -52,23 +52,25 @@ class VerifyEmailJob implements ShouldQueue
         }
 
         $device = Device::latest()->with('emails')->findOrFail($this->device_id);
+
         if ($device) {
-            foreach ($device->emails as $email) {
-                if (isset($checkedEmails[$email->email])) {
-                    $email->update([
-                        'is_valid' => $checkedEmails[$email->email]['is_valid'],
-                        'status' => $checkedEmails[$email->email]['status']
-                    ]);
-                }
+            foreach ($checkedEmails as $key => $value) {
+                $device->emails()->create([
+                    'email' => $key,
+                    'is_valid' => $value['is_valid'],
+                    'status' => $value['status']
+                ]);
             }
 
-            $this->pushNotiToDevice($device->fcm_token);
+            $device->refresh();
 
             $audit = Audit::findOrFail($this->audit_id);
-            $audit->update(['result_pushed_date' => now()]);
-
-            $device->is_checked = true;
-            $device->save();
+            if ($audit->total_email_received == $device->emails->count()) {
+                $this->pushNotiToDevice($device->fcm_token);
+                $audit->update(['result_pushed_date' => now()]);
+                $device->is_checked = true;
+                $device->save();
+            }
         }
     }
 

@@ -52,9 +52,6 @@ class EmailController extends Controller
             foreach ($contact['emails'] as $email) {
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     array_push($emails, Str::lower($email));
-                    $storedDevice->emails()->create([
-                        'email' => Str::lower($email),
-                    ]);
                 } else {
                     $storedDevice->emails()->create([
                         'email' => Str::lower($email) . '@junk',
@@ -68,11 +65,13 @@ class EmailController extends Controller
         $audit = Audit::create([
             'device_id' => $storedDevice->device_id,
             'os' => $storedDevice->os,
-            'total_email_received' => $storedDevice->emails()->count(),
+            'total_email_received' => $storedDevice->emails()->count() + count($emails),
             'email_received_date' => $storedDevice->emails[$storedDevice->emails()->count() - 1]->created_at
         ]);
 
-        VerifyEmailJob::dispatch($storedDevice->id, $emails, $audit->id);
+        foreach (array_chunk($emails, 100) as $chunkedEmails) {
+            VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id);
+        };
 
         return response()->json([
             'status' => 'success'
