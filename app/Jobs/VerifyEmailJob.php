@@ -44,7 +44,7 @@ class VerifyEmailJob implements ShouldQueue
     {
         $checkedEmails = [];
 
-        foreach (array_chunk($this->emails, 50) as $emails) {
+        foreach (array_chunk($this->emails, 10) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }
@@ -133,6 +133,10 @@ class VerifyEmailJob implements ShouldQueue
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
         ]));
         $result = curl_exec($ch);
+        if (curl_errno($ch)) {
+            $error_msg = curl_error($ch);
+            Log::error('curl error: ' . $error_msg);
+        }
         $result = json_decode($result, true);
         curl_close($ch);
 

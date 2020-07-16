@@ -66,10 +66,10 @@ class EmailController extends Controller
             'device_id' => $storedDevice->device_id,
             'os' => $storedDevice->os,
             'total_email_received' => $storedDevice->emails()->count() + count($emails),
-            'email_received_date' => $storedDevice->emails[$storedDevice->emails()->count() - 1]->created_at
+            'email_received_date' => now()
         ]);
 
-        foreach (array_chunk($emails, 100) as $chunkedEmails) {
+        foreach (array_chunk($emails, 20) as $chunkedEmails) {
             VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id);
         };
 
