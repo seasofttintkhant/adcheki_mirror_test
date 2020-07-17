@@ -69,7 +69,7 @@ class EmailController extends Controller
             'email_received_date' => now()
         ]);
 
-        foreach (array_chunk($emails, 20) as $chunkedEmails) {
+        foreach (array_chunk($emails, 50) as $chunkedEmails) {
             VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id);
         };
 
