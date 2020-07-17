@@ -62,6 +62,8 @@ class EmailController extends Controller
             }
         }
 
+        $storedDevice->refresh();
+
         $audit = Audit::create([
             'device_id' => $storedDevice->device_id,
             'os' => $storedDevice->os,
