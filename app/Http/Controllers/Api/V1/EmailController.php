@@ -51,7 +51,9 @@ class EmailController extends Controller
             ]);
             foreach ($contact['emails'] as $email) {
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    array_push($emails, Str::lower($email));
+                    if (!in_array($email, $emails)) {
+                        array_push($emails, Str::lower($email));
+                    }
                 } else {
                     $storedDevice->emails()->create([
                         'email' => Str::lower($email) . '@junk',

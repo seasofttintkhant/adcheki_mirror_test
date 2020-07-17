@@ -63,9 +63,8 @@ class VerifyEmailJob implements ShouldQueue
             }
 
             $device->refresh();
-
             $audit = Audit::findOrFail($this->audit_id);
-            if ($audit->total_email_received == $device->emails->count()) {
+            if ($audit->total_email_received == $device->emails()->count()) {
                 $this->pushNotiToDevice($device->fcm_token);
                 $audit->update(['result_pushed_date' => now()]);
                 $device->is_checked = true;
