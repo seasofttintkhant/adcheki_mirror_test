@@ -55,7 +55,7 @@ class EmailController extends Controller
                     }
                 } else {
                     $storedDevice->emails()->create([
-                        'email' => $email . '@junk',
+                        'email' => $email['email'] . '@junk',
                         'unique_email_id' => $email['id'],
                         'is_valid' => 0,
                         'status' => 1
