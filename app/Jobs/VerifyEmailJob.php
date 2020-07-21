@@ -43,8 +43,7 @@ class VerifyEmailJob implements ShouldQueue
     public function handle()
     {
         $checkedEmails = [];
-        $emailsWithEmailAsKey = [];
-
+        $sentEmails = [];
         foreach (array_chunk($this->emails, 10) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
@@ -52,23 +51,24 @@ class VerifyEmailJob implements ShouldQueue
             $onlyEmails = [];
             foreach ($emails as $email) {
                 $onlyEmails[] = $email['email'];
-                $emailsWithEmailAsKey[$email['email']] = $email;
+                array_push($sentEmails, $email);
             }
             $checkedEmails = array_merge($checkedEmails, $this->checkEmails($onlyEmails));
         }
-
         $device = Device::latest()->with('emails')->findOrFail($this->device_id);
+
         if ($device) {
-            foreach ($checkedEmails as $key => $value) {
+            foreach ($sentEmails as $sentEmail) {
                 $device->emails()->create([
-                    'email' => $key,
-                    'unique_email_id' => $emailsWithEmailAsKey[$key]['id'],
-                    'is_valid' => $value['is_valid'],
-                    'status' => $value['status']
+                    'email' => $sentEmail['email'],
+                    'unique_email_id' => $sentEmail['id'],
+                    'is_valid' => $checkedEmails[$sentEmail['email']]['is_valid'],
+                    'status' => $checkedEmails[$sentEmail['email']]['status']
                 ]);
             }
 
             $device->refresh();
+
             $audit = Audit::findOrFail($this->audit_id);
 
             if ($audit->total_email_received == $device->emails()->count()) {

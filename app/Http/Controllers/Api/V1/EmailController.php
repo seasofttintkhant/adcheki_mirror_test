@@ -50,9 +50,7 @@ class EmailController extends Controller
             ]);
             foreach ($contact['emails'] as $email) {
                 if (filter_var($email['email'], FILTER_VALIDATE_EMAIL)) {
-                    if (!in_array($email['email'], $emails)) {
-                        array_push($emails, $email);
-                    }
+                    array_push($emails, $email);
                 } else {
                     $storedDevice->emails()->create([
                         'email' => $email['email'] . '@junk',
@@ -63,7 +61,6 @@ class EmailController extends Controller
                 }
             }
         }
-
         $storedDevice->refresh();
 
         $audit = Audit::create([
