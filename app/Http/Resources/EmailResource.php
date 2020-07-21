@@ -16,6 +16,7 @@ class EmailResource extends JsonResource
     {
         return [
             'email' => $this->email,
+            'id' => $this->unique_email_id,
             'valid' => $this->is_valid ? true : false,
             'exist' => $this->status == 2
         ];

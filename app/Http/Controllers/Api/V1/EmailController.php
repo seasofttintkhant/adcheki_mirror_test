@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\Audit;
 use App\Models\Email;
 use App\Models\Device;
-use Illuminate\Support\Str;
 use App\Jobs\VerifyEmailJob;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -50,13 +49,14 @@ class EmailController extends Controller
                 'data' => json_encode($contact)
             ]);
             foreach ($contact['emails'] as $email) {
-                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    if (!in_array($email, $emails)) {
-                        array_push($emails, Str::lower($email));
+                if (filter_var($email['email'], FILTER_VALIDATE_EMAIL)) {
+                    if (!in_array($email['email'], $emails)) {
+                        array_push($emails, $email);
                     }
                 } else {
                     $storedDevice->emails()->create([
-                        'email' => Str::lower($email) . '@junk',
+                        'email' => $email . '@junk',
+                        'unique_email_id' => $email['id'],
                         'is_valid' => 0,
                         'status' => 1
                     ]);
@@ -118,7 +118,7 @@ class EmailController extends Controller
         $emails = explode(',', $request->emails);
         $lowerCaseEmails = [];
         foreach ($emails as $email) {
-            $lowerCaseEmails[] = Str::lower($email);
+            $lowerCaseEmails[] = $email;
         }
 
         $header = [
