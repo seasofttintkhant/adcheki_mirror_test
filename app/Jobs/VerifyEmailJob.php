@@ -43,27 +43,21 @@ class VerifyEmailJob implements ShouldQueue
     public function handle()
     {
         $checkedEmails = [];
-        $sentEmails = [];
+
         foreach (array_chunk($this->emails, 10) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }
-            $onlyEmails = [];
-            foreach ($emails as $email) {
-                $onlyEmails[] = $email['email'];
-                array_push($sentEmails, $email);
-            }
-            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($onlyEmails));
+            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
         }
         $device = Device::latest()->with('emails')->findOrFail($this->device_id);
 
         if ($device) {
-            foreach ($sentEmails as $sentEmail) {
+            foreach ($this->emails as $email) {
                 $device->emails()->create([
-                    'email' => $sentEmail['email'],
-                    'unique_email_id' => $sentEmail['id'],
-                    'is_valid' => $checkedEmails[$sentEmail['email']]['is_valid'],
-                    'status' => $checkedEmails[$sentEmail['email']]['status']
+                    'email' => $email,
+                    'is_valid' => $checkedEmails[$email]['is_valid'],
+                    'status' => $checkedEmails[$email]['status']
                 ]);
             }
 

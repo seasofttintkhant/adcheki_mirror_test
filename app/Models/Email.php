@@ -10,7 +10,6 @@ class Email extends Model
 
     protected $fillable = [
         'mail_address_id',
-        'unique_email_id',
         'device_id',
         'email',
         'is_valid',

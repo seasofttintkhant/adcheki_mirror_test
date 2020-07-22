@@ -49,12 +49,13 @@ class EmailController extends Controller
                 'data' => json_encode($contact)
             ]);
             foreach ($contact['emails'] as $email) {
-                if (filter_var($email['email'], FILTER_VALIDATE_EMAIL)) {
-                    array_push($emails, $email);
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    if (!in_array($email, $emails)) {
+                        array_push($emails, $email);
+                    }
                 } else {
                     $storedDevice->emails()->create([
-                        'email' => $email['email'] . '@junk',
-                        'unique_email_id' => $email['id'],
+                        'email' => $email . '@junk',
                         'is_valid' => 0,
                         'status' => 1
                     ]);
@@ -113,10 +114,6 @@ class EmailController extends Controller
     public function individualCheck(Request $request)
     {
         $emails = explode(',', $request->emails);
-        $lowerCaseEmails = [];
-        foreach ($emails as $email) {
-            $lowerCaseEmails[] = $email;
-        }
 
         $header = [
             'Accept: application/json',
@@ -133,7 +130,7 @@ class EmailController extends Controller
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-            'emails' => $lowerCaseEmails,
+            'emails' => $emails,
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
         ]));
         $result = curl_exec($ch);
@@ -141,7 +138,7 @@ class EmailController extends Controller
         curl_close($ch);
 
         $deviceEmails = [];
-        foreach ($lowerCaseEmails as $email) {
+        foreach ($emails as $email) {
             $deviceEmails[] = [
                 'email' => $email,
                 'is_valid' => $result[$email]['is_valid'],
