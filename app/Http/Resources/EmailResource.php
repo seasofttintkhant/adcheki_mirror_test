@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EmailResource extends JsonResource
@@ -15,7 +16,7 @@ class EmailResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'email' => $this->email,
+            'email' => Str::contains($this->email, '@junk') ? Str::before($this->email, '@junk') : $this->email,
             'valid' => $this->is_valid ? true : false,
             'exist' => $this->status == 2
         ];
