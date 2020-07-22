@@ -139,7 +139,7 @@ class VerifyEmailJob implements ShouldQueue
         }
         $result = json_decode($result, true);
         curl_close($ch);
-
+        dump($result);
         return $result;
     }
 }

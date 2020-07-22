@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api\V1;
 use App\Models\Audit;
 use App\Models\Email;
 use App\Models\Device;
+use GuzzleHttp\Client;
 use App\Jobs\VerifyEmailJob;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailCollection;
+use GuzzleHttp\Exception\GuzzleException;
 
 class EmailController extends Controller
 {
@@ -70,10 +73,47 @@ class EmailController extends Controller
             'total_email_received' => $storedDevice->emails()->count() + count($emails),
             'email_received_date' => now()
         ]);
-
-        foreach (array_chunk($emails, 50) as $chunkedEmails) {
-            VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id);
-        };
+        if (count($emails) > 0) {
+            foreach (array_chunk($emails, 50) as $chunkedEmails) {
+                VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id);
+            };
+        } else {
+            $serverKey = config('services.push_noti.server_key');
+            $endPoint = config('services.push_noti.endpoint');
+            $message = [
+                'to' => $storedDevice->fcm_token,
+                'notification' => [
+                    'title' => 'チェックが完了しました！',
+                    'body' => '結果タブでチェック結果をご確認ください。',
+                ],
+                'data' => [
+                    'type' => 'completed_checking'
+                ]
+            ];
+            try {
+                $client = new Client([
+                    'headers' => [
+                        'Authorization' => 'key=' . $serverKey,
+                        'Accept' => 'application/json'
+                    ],
+                ]);
+                $response = $client->post(
+                    $endPoint,
+                    [
+                        'json' => $message,
+                    ]
+                );
+                $response = json_decode($response->getBody()->getContents());
+                if ($response->success) {
+                    $audit->update(['result_pushed_date' => now()]);
+                    $storedDevice->update(['is_checked' => true]);
+                } else {
+                    Log::error('Push Noti Errors:' . $response->results[0]->error);
+                }
+            } catch (GuzzleException $error) {
+                Log::error('Guzzle Errors: ' . $error);
+            }
+        }
 
         return response()->json([
             'status' => 'success'
