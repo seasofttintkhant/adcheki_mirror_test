@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Audit;
 use App\Models\Device;
 use GuzzleHttp\Client;
+use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
@@ -43,12 +44,17 @@ class VerifyEmailJob implements ShouldQueue
     public function handle()
     {
         $checkedEmails = [];
-
+        $uniqueEmails = [];
         foreach (array_chunk($this->emails, 10) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }
-            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($emails));
+            foreach ($emails as $email) {
+                if (!in_array(Str::lower($email), $uniqueEmails)) {
+                    $uniqueEmails[] = Str::lower($email);
+                }
+            }
+            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));
         }
         $device = Device::latest()->with('emails')->findOrFail($this->device_id);
 
@@ -56,8 +62,8 @@ class VerifyEmailJob implements ShouldQueue
             foreach ($this->emails as $email) {
                 $device->emails()->create([
                     'email' => $email,
-                    'is_valid' => $checkedEmails[$email]['is_valid'],
-                    'status' => $checkedEmails[$email]['status']
+                    'is_valid' => $checkedEmails[Str::lower($email)]['is_valid'],
+                    'status' => $checkedEmails[Str::lower($email)]['status']
                 ]);
             }
 
