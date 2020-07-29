@@ -44,16 +44,18 @@ class VerifyEmailJob implements ShouldQueue
     public function handle()
     {
         $checkedEmails = [];
-        $uniqueEmails = [];
-        foreach (array_chunk($this->emails, 10) as $emails) {
+        foreach (array_chunk($this->emails, 25) as $emails) {
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }
+
+            $uniqueEmails = [];
             foreach ($emails as $email) {
                 if (!in_array(Str::lower($email), $uniqueEmails)) {
                     $uniqueEmails[] = Str::lower($email);
                 }
             }
+
             $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));
         }
         $device = Device::latest()->with('emails')->findOrFail($this->device_id);
@@ -128,7 +130,7 @@ class VerifyEmailJob implements ShouldQueue
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        $mail_checking_server = 'https://check01.adcheki.jp';
+        // $mail_checking_server = 'https://check01.adcheki.jp';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
