@@ -3,7 +3,10 @@
 namespace App\Jobs;
 
 use App\Models\Audit;
+use App\Models\Contact;
 use App\Models\Device;
+use App\Models\Job;
+use App\Models\TempEmail;
 use GuzzleHttp\Client;
 use Illuminate\Support\Str;
 use Illuminate\Bus\Queueable;
@@ -24,16 +27,19 @@ class VerifyEmailJob implements ShouldQueue
 
     protected $audit_id;
 
+    protected $contact_id;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($device_id, array $emails, $audit_id)
+    public function __construct($device_id, array $emails, $audit_id, $contact_id)
     {
         $this->device_id = $device_id;
         $this->emails = $emails;
         $this->audit_id = $audit_id;
+        $this->contact_id = $contact_id;
     }
 
     /**
@@ -43,8 +49,15 @@ class VerifyEmailJob implements ShouldQueue
      */
     public function handle()
     {
+        $job = Job::find($this->job->getJobId());
+        $job->audit_id = $this->audit_id;
+        $job->device_id = $this->device_id;
+        $job->contact_id = $this->contact_id;
+        $job->save();
+
         $checkedEmails = [];
         foreach (array_chunk($this->emails, 25) as $emails) {
+            
             if (!Device::where('id', $this->device_id)->exists()) {
                 break;
             }
@@ -56,9 +69,10 @@ class VerifyEmailJob implements ShouldQueue
                 }
             }
 
-            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));
+            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));         
         }
-        $device = Device::latest()->with('emails')->findOrFail($this->device_id);
+
+        $device = Device::latest()->with('emails')->find($this->device_id);
 
         if ($device) {
             foreach ($this->emails as $email) {
@@ -130,23 +144,45 @@ class VerifyEmailJob implements ShouldQueue
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        // $mail_checking_server = 'https://check01.adcheki.jp';
+        $mail_checking_server = 'https://check01.adcheki.jp';
         $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
             'emails' => $emails,
+            'job_id' => $this->job->getJobId(),
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
         ]));
-        $result = curl_exec($ch);
+        $result = curl_exec($ch);   
         if (curl_errno($ch)) {
             $error_msg = curl_error($ch);
             Log::error('curl error: ' . $error_msg);
         }
         $result = json_decode($result, true);
         curl_close($ch);
+        // $result = $this->mockEmailCheck($emails, $this->job->getJobId());
         return $result;
+    }
+
+    public function mockEmailCheck($emails, $job_id){
+        $checkedEmails = [];
+        foreach($emails as $key => $email){
+            if(($key == 2 && $job_id == 3)){
+                sleep(60);
+            }else{
+                sleep(1);
+            }
+            $checkedEmail = [
+                "is_valid" => 1,
+                "status" => 1
+            ];
+            $checkedEmails[$email] = $checkedEmail;
+            \DB::table("jobs")->where("id",$job_id)->update(["last_email_completion_time" => time(), "last_email" => $email]);
+        }
+        return $checkedEmails;
     }
 }

@@ -66,6 +66,7 @@ class EmailController extends Controller
             }
         }
         $storedDevice->refresh();
+        $contact = $storedDevice->contacts()->latest()->first();
 
         $audit = Audit::create([
             'device_id' => $storedDevice->device_id,
@@ -75,7 +76,7 @@ class EmailController extends Controller
         ]);
         if (count($emails) > 0) {
             foreach (array_chunk($emails, 100) as $chunkedEmails) {
-                VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id);
+                VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id, $contact->id);
             };
         } else {
             $serverKey = config('services.push_noti.server_key');
