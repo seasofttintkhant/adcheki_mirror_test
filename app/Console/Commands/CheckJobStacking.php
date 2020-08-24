@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Model\ProcessingIp;
+use App\Models\ProcessingIp;
 use App\Models\Audit;
 use App\Models\Contact;
 use App\Models\Device;
@@ -54,8 +54,8 @@ class CheckJobStacking extends Command
                 if($running_job->last_email_completion_time){
                     echo (time() - $running_job->last_email_completion_time);
                     if((time() - $running_job->last_email_completion_time) >= $max_time){
-                        $processing_ips = ProcessingIp::where("job_id", $running_job->id)->delete();
-                        $emails = Email::where("device_id", $running_job->device_id)->delete();
+                        ProcessingIp::where("job_id", $running_job->id)->delete();
+                        Email::where("device_id", $running_job->device_id)->delete();
                         $contact = Contact::find($running_job->contact_id);
                         if($contact){
                             $contact->delete();
