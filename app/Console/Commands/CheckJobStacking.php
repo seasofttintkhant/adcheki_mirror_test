@@ -45,7 +45,7 @@ class CheckJobStacking extends Command
     public function handle()
     {
         //
-        $max_time = env("MAX_EXEC_TIME_OF_JOB_AFTER_ONE_MAIL_CHECKED",3000);
+        $max_time = env("MAX_EXEC_TIME_OF_JOB_AFTER_ONE_MAIL_CHECKED",300);
         // $max_time = 10;
         $running_jobs = Job::all();
         if(count($running_jobs)){
@@ -53,6 +53,7 @@ class CheckJobStacking extends Command
                 if($running_job->last_email_completion_time){
                     echo (time() - $running_job->last_email_completion_time);
                     if((time() - $running_job->last_email_completion_time) >= $max_time){
+                        \Log::info($running_job->device_id);
                         $emails = Email::where("device_id", $running_job->device_id)->delete();
                         $contact = Contact::find($running_job->contact_id);
                         if($contact){
@@ -62,13 +63,13 @@ class CheckJobStacking extends Command
                         if($device){
                             $device->is_checked = 1;
                             $device->save();
+                            $this->pushNotiToDevice($device->fcm_token);
                         }
                         $audit = Audit::find($running_job->audit_id);
                         if($audit){
                             $audit->result_pushed_date = now();
                             $audit->canceled_date = now();
                             $audit->save();
-                            $this->pushNotiToDevice($device->fcm_token);
                         }
                         $running_job->delete();
                         echo "time excced and stoped";

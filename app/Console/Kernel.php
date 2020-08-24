@@ -14,7 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\SendToIsolatedBackend::class,
-        Commands\SendToIsolatedBackendEvery10Mintues::class
+        Commands\SendToIsolatedBackendEvery10Mintues::class,
+        Commands\CheckJobStacking::class
     ];
 
     /**
@@ -33,6 +34,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command('devices:sendeverytenminutes')
             ->everyTenMinutes();
+
+        $schedule->command('check:jobstacking')
+            ->everyFiveMinutes();
     }
 
     /**
