@@ -39,6 +39,7 @@ class EmailController extends Controller
             $existingDevice = Device::firstWhere('device_id', $request->device_id);
             $audit = Audit::where("device_id", $existingDevice->device_id)->orderBy("email_received_date", "DESC")->first();
             if($audit){
+                $audit->result_pushed_date = now();
                 $audit->user_canceled_date = now();
                 $audit->save();
             }
