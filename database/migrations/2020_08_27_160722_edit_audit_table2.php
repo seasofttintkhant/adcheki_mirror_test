@@ -15,7 +15,7 @@ class EditAuditTable2 extends Migration
     {
         Schema::table('audits', function (Blueprint $table) {
             //
-            // $table->chnage("canceled_date", "system_canceled_date")->nullable();
+            $table->renameColumn("canceled_date", "system_canceled_date")->nullable();
             $table->dateTime("user_canceled_date")->nullable();
         });
     }
