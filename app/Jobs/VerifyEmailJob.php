@@ -77,10 +77,15 @@ class VerifyEmailJob implements ShouldQueue
 
         if ($device) {
             foreach ($this->emails as $email) {
+                $is_valid = $checkedEmails[Str::lower($email)]['is_valid'];
+                $is_exist = $checkedEmails[Str::lower($email)]['status'];
                 $device->emails()->create([
                     'email' => $email,
-                    'is_valid' => $checkedEmails[Str::lower($email)]['is_valid'],
-                    'status' => $checkedEmails[Str::lower($email)]['status']
+                    'is_valid' => $is_valid,
+                    'status' => $is_exist,
+                    'ok' => $this->calcResult($is_valid, $is_exist)[0],
+                    'ng' => $this->calcResult($is_valid, $is_exist)[1],
+                    'unknown' => $this->calcResult($is_valid, $is_exist)[2],
                 ]);
             }
 
@@ -173,17 +178,33 @@ class VerifyEmailJob implements ShouldQueue
         $checkedEmails = [];
         foreach($emails as $key => $email){
             if($key == 1){
-                sleep(60);
+                sleep(1);
             }else{
                 sleep(1);
             }
             $checkedEmail = [
                 "is_valid" => 1,
-                "status" => 1
+                "status" => 2
             ];
             $checkedEmails[$email] = $checkedEmail;
             \DB::table("jobs")->where("id",$this->job->getJobId())->update(["last_email_completion_time" => time(), "last_email" => $email]);
         }
         return $checkedEmails;
+    }
+
+    public function calcResult($is_valid, $is_exist){
+        $ok = 0;
+        $ng = 0;
+        $unknown = 0;
+        if($is_valid == 0 || $is_exist == 1){
+            $ng = 1;
+        }else if($is_valid == 1 || $is_exist == 2){
+            $ok = 1;
+        }else if($is_valid == 1 || $is_exist == 1){
+            $ng = 1;
+        }else if($is_valid == 1 || $is_exist == 0){
+            $unknown = 1;
+        }
+        return [$ok, $ng, $unknown];
     }
 }

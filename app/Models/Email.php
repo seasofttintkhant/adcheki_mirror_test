@@ -13,7 +13,10 @@ class Email extends Model
         'device_id',
         'email',
         'is_valid',
-        'status'
+        'status',
+        'ok',
+        'ng',
+        'unknown'
     ];
 
     public function device()
