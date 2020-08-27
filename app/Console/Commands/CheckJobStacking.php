@@ -47,7 +47,6 @@ class CheckJobStacking extends Command
     {
         //
         $max_time = env("MAX_EXEC_TIME_OF_JOB_AFTER_ONE_MAIL_CHECKED",300);
-        // $max_time = 10;
         $running_jobs = Job::all();
         if(count($running_jobs)){
             foreach($running_jobs as $running_job){
@@ -69,7 +68,7 @@ class CheckJobStacking extends Command
                         $audit = Audit::find($running_job->audit_id);
                         if($audit){
                             $audit->result_pushed_date = now();
-                            $audit->canceled_date = now();
+                            $audit->system_canceled_date = now();
                             $audit->save();
                         }
                         $running_job->delete();

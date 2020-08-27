@@ -70,6 +70,7 @@ class VerifyEmailJob implements ShouldQueue
             }
 
             $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));         
+            // $checkedEmails = array_merge($checkedEmails, $this->mockEmailCheck($uniqueEmails));         
         }
 
         $device = Device::latest()->with('emails')->find($this->device_id);
@@ -168,10 +169,10 @@ class VerifyEmailJob implements ShouldQueue
         return $result;
     }
 
-    public function mockEmailCheck($emails, $job_id){
+    public function mockEmailCheck($emails){
         $checkedEmails = [];
         foreach($emails as $key => $email){
-            if(($key == 2 && $job_id == 3)){
+            if($key == 1){
                 sleep(60);
             }else{
                 sleep(1);
@@ -181,7 +182,7 @@ class VerifyEmailJob implements ShouldQueue
                 "status" => 1
             ];
             $checkedEmails[$email] = $checkedEmail;
-            \DB::table("jobs")->where("id",$job_id)->update(["last_email_completion_time" => time(), "last_email" => $email]);
+            \DB::table("jobs")->where("id",$this->job->getJobId())->update(["last_email_completion_time" => time(), "last_email" => $email]);
         }
         return $checkedEmails;
     }

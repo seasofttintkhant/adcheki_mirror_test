@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailCollection;
+use App\Models\Contact;
 use GuzzleHttp\Exception\GuzzleException;
 
 class EmailController extends Controller
@@ -36,6 +37,15 @@ class EmailController extends Controller
 
         if (Device::where('device_id', $request->device_id)->exists()) {
             $existingDevice = Device::firstWhere('device_id', $request->device_id);
+            $audit = Audit::where("device_id", $existingDevice->device_id)->orderBy("email_received_date", "DESC")->first();
+            if($audit){
+                $audit->user_canceled_date = now();
+                $audit->save();
+            }
+            
+            Contact::where("device_id", $existingDevice->id)->delete();
+            Email::where("device_id", $existingDevice->id)->delete();
+            
             $existingDevice->delete();
         }
 
