@@ -317,4 +317,27 @@ class EmailController extends Controller
             'canceled' => $audit->canceled_date ? true : false
         ]);
     }
+
+    public function cancel(Request $request){
+        if (Device::where('device_id', $request->device_id)->exists()) {
+            $existingDevice = Device::firstWhere('device_id', $request->device_id);
+            $audit = Audit::where("device_id", $existingDevice->device_id)->orderBy("email_received_date", "DESC")->first();
+            if($audit){
+                $audit->result_pushed_date = now();
+                $audit->user_canceled_date = now();
+                $audit->save();
+            }
+            
+            Contact::where("device_id", $existingDevice->id)->delete();
+            Email::where("device_id", $existingDevice->id)->delete();
+            
+            $existingDevice->delete();
+            return response()->json([
+                'canceled' => true
+            ]); 
+        }
+        return response()->json([
+            'canceled' => false
+        ]); 
+    }
 }

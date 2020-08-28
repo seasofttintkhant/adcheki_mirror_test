@@ -24,4 +24,5 @@ Route::prefix('v1')->group(function () {
     Route::get('email/results', 'EmailController@getResults');
     Route::post('email/results/status', 'EmailController@resultsStatus');
     Route::get('email/completed', 'EmailController@completed');
+    Route::post('email/cancel', 'EmailController@cancel');
 });
