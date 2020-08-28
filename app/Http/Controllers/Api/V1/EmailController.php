@@ -330,6 +330,8 @@ class EmailController extends Controller
             
             Contact::where("device_id", $existingDevice->id)->delete();
             Email::where("device_id", $existingDevice->id)->delete();
+
+            $this->pushNotiToDevice($existingDevice->fcm_token);
             
             $existingDevice->delete();
             return response()->json([
@@ -339,5 +341,42 @@ class EmailController extends Controller
         return response()->json([
             'canceled' => false
         ]); 
+    }
+
+    protected function pushNotiToDevice($fcmToken)
+    {
+        $serverKey = config('services.push_noti.server_key');
+        $endPoint = config('services.push_noti.endpoint');
+        $message = [
+            'to' => $fcmToken,
+            'notification' => [
+                'title' => 'Internal system error!',
+                'body' => 'Your checking process was canceled.',
+            ],
+            'data' => [
+                'type' => 'fail_checking'
+            ]
+        ];
+        try {
+            $client = new Client([
+                'headers' => [
+                    'Authorization' => 'key=' . $serverKey,
+                    'Accept' => 'application/json'
+                ],
+            ]);
+            $response = $client->post(
+                $endPoint,
+                [
+                    'json' => $message,
+                ]
+            );
+            $response = json_decode($response->getBody()->getContents());
+            if ($response->success) {
+                return true;
+            }
+            return false;
+        } catch (GuzzleException $error) {
+            return false;
+        }
     }
 }
