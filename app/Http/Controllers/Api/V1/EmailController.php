@@ -311,10 +311,16 @@ class EmailController extends Controller
             ]);
         }
 
+        if($audit->system_canceled_date || $audit->user_canceled_date){
+            $canceled = true;
+        }else{
+            $canceled = false;
+        }
+
         return response()->json([
             'completed' => $device->is_checked ? true : false,
             'downloaded' => $device->is_checked ? false : true,
-            'canceled' => $audit->canceled_date ? true : false
+            'canceled' => $canceled
         ]);
     }
 
