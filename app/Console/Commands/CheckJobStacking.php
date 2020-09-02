@@ -47,6 +47,7 @@ class CheckJobStacking extends Command
     {
         //
         $max_time = env("MAX_EXEC_TIME_OF_JOB_AFTER_ONE_MAIL_CHECKED",300);
+        // $max_time = 1;
         $running_jobs = Job::all();
         if(count($running_jobs)){
             foreach($running_jobs as $running_job){
@@ -59,7 +60,7 @@ class CheckJobStacking extends Command
                         if($contact){
                             $contact->delete();
                         }
-                        $device = Device::find($running_job->device_id);
+                        $device = Device::where("id", $running_job->device_id)->where("is_checked", "<>", 1)->first();
                         if($device){
                             $device->is_checked = 1;
                             $device->save();
