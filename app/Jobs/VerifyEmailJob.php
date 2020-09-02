@@ -86,6 +86,7 @@ class VerifyEmailJob implements ShouldQueue
                     'ok' => $this->calcResult($is_valid, $is_exist)[0],
                     'ng' => $this->calcResult($is_valid, $is_exist)[1],
                     'unknown' => $this->calcResult($is_valid, $is_exist)[2],
+                    'os' => $device->os
                 ]);
             }
 
@@ -150,7 +151,7 @@ class VerifyEmailJob implements ShouldQueue
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        $mail_checking_server = 'https://check01.adcheki.jp';
+        // $mail_checking_server = 'https://check01.adcheki.jp';
         $ch = curl_init();
         // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
