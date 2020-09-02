@@ -16,7 +16,8 @@ class Email extends Model
         'status',
         'ok',
         'ng',
-        'unknown'
+        'unknown',
+        'os'
     ];
 
     public function device()
