@@ -71,7 +71,11 @@ class EmailController extends Controller
                     $storedDevice->emails()->create([
                         'email' => $email . '@junk',
                         'is_valid' => 0,
-                        'status' => 1
+                        'status' => 1,
+                        'ok' => 0,
+                        'ng' => 1,
+                        'unknown' => 0,
+                        'os' => $storedDevice->os
                     ]);
                 }
             }
