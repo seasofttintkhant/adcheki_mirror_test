@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Carbon\Carbon;
 use App\Models\Device;
+use App\Models\Email;
 use Illuminate\Console\Command;
 
 class SendToIsolatedBackend extends Command
@@ -40,34 +41,32 @@ class SendToIsolatedBackend extends Command
     public function handle()
     {
         $dueTime = Carbon::now()->subDay();
+        
+        Email::whereHas("device", function($q) use($dueTime){
+            $q->where("is_checked",1);
+            $q->where('updated_at', '<=', $dueTime);
+        })->groupBy('email')
+        ->chunk(100, function ($emails) {
+            $header = [
+                'Accept: application/json',
+                'Content-Type: application/json'
+            ];
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                'emails' => $emails,
+                'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
+            ]));
+            $result = curl_exec($ch);
+            $result = json_decode($result, true);
+            curl_close($ch);
+        });
+        
         Device::where('updated_at', '<=', $dueTime)
-            ->with(['contacts', 'emails'])
             ->where('is_checked', 1)
-            ->chunk(100, function ($dueDevices) {
-                foreach ($dueDevices as $device) {
-                    if ($device !== null) {
-                        $header = [
-                            'Accept: application/json',
-                            'Content-Type: application/json'
-                        ];
-
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_POST, true);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                            'device' => $device,
-                            'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
-                        ]));
-                        $result = curl_exec($ch);
-                        $result = json_decode($result, true);
-                        curl_close($ch);
-                        if ($result['status'] === 'success') {
-                            $device->delete();
-                        }
-                    }
-                }
-            });
+            ->delete();
     }
 }

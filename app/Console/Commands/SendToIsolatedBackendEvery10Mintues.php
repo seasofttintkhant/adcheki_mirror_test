@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Device;
+use App\Models\Email;
 use Illuminate\Console\Command;
 
 class SendToIsolatedBackendEvery10Mintues extends Command
@@ -38,30 +39,26 @@ class SendToIsolatedBackendEvery10Mintues extends Command
      */
     public function handle()
     {
-        Device::with(['contacts', 'emails'])
-            ->where('is_checked', 1)
-            ->chunk(100, function ($dueDevices) {
-                foreach ($dueDevices as $device) {
-                    if ($device !== null) {
-                        $header = [
-                            'Accept: application/json',
-                            'Content-Type: application/json'
-                        ];
-
-                        $ch = curl_init();
-                        curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
-                        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                        curl_setopt($ch, CURLOPT_POST, true);
-                        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-                        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                            'device' => $device,
-                            'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
-                        ]));
-                        $result = curl_exec($ch);
-                        $result = json_decode($result, true);
-                        curl_close($ch);
-                    }
-                }
+        Email::whereHas("device", function($q){
+                $q->where("is_checked",1);
+            })->groupBy('email')
+            ->chunk(100, function ($emails) {
+                $header = [
+                    'Accept: application/json',
+                    'Content-Type: application/json'
+                ];
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                    'emails' => $emails,
+                    'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
+                ]));
+                $result = curl_exec($ch);
+                $result = json_decode($result, true);
+                curl_close($ch);
             });
     }
 }
