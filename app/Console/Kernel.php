@@ -32,8 +32,8 @@ class Kernel extends ConsoleKernel
         $schedule->command('devices:send')
             ->everyTenMinutes();
 
-        $schedule->command('devices:sendeverytenminutes')
-            ->everyTenMinutes();
+        // $schedule->command('devices:sendeverytenminutes')
+        //     ->everyTenMinutes();
 
         $schedule->command('check:jobstacking')
             ->everyFiveMinutes();
