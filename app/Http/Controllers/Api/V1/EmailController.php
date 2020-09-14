@@ -179,7 +179,7 @@ class EmailController extends Controller
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        $mail_checking_server = 'https://check01.adcheki.jp';
+        // $mail_checking_server = 'https://check01.adcheki.jp';
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -255,9 +255,7 @@ class EmailController extends Controller
         }
 
         if ($request->status == 200) {
-            $device = Device::with(['contacts', 'emails'])
-                ->latest()
-                ->firstWhere('device_id', $request->device_id);
+            $device = Device::with("emails")->where("is_checked", 1)->where('device_id', $request->device_id)->first();
             if ($device === null) {
                 return response()->json([
                     'status' => 'error',
@@ -276,7 +274,7 @@ class EmailController extends Controller
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'device' => $device,
+                'emails' => $device->emails,
                 'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
             ]));
             $result = curl_exec($ch);
@@ -284,6 +282,7 @@ class EmailController extends Controller
             curl_close($ch);
 
             if ($result['status'] === 'success') {
+                Email::whereIn("id", $device->emails->pluck("id")->toArray())->delete();
                 $device->delete();
                 return response()->json([
                     'status' => 'success'
