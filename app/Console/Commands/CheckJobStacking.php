@@ -50,10 +50,12 @@ class CheckJobStacking extends Command
         // $max_time = 1;
         $running_jobs = Job::all();
         if(count($running_jobs)){
+            $found_device_id = "";
             foreach($running_jobs as $running_job){
                 if($running_job->last_email_completion_time){
                     echo (time() - $running_job->last_email_completion_time);
-                    if((time() - $running_job->last_email_completion_time) >= $max_time){
+                    if(((time() - $running_job->last_email_completion_time) >= $max_time) || ($found_device_id == $running_job->device_id)){
+                        $found_device_id = $running_job->device_id;
                         ProcessingIp::where("job_id", $running_job->id)->delete();
                         Email::where("device_id", $running_job->device_id)->delete();
                         $contact = Contact::find($running_job->contact_id);
