@@ -304,20 +304,23 @@ class EmailController extends Controller
     public function completed(Request $request)
     {
         $device = Device::where('device_id', $request->device_id)->first();
-        $audit = Audit::where("device_id", $request->device_id)->latest()->first();
+        $audit = Audit::where("device_id", $request->device_id)->where("result_gathered",0)->latest()->first();
+
+        $canceled = false;
+        if($audit){
+            if($audit->system_canceled_date || $audit->user_canceled_date){
+                $canceled = true;
+            }
+            $audit->result_gathered = 1;
+            $audit->save();
+        }
 
         if (!$device) {
             return response()->json([
                 'completed' => true,
                 'downloaded' => false,
-                'canceled' => false
+                'canceled' => $canceled
             ]);
-        }
-
-        if($audit->system_canceled_date || $audit->user_canceled_date){
-            $canceled = true;
-        }else{
-            $canceled = false;
         }
 
         return response()->json([
