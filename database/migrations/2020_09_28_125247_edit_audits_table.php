@@ -16,7 +16,7 @@ class EditAuditsTable extends Migration
         //
         Schema::table('audits', function (Blueprint $table) {
             //
-            $table->integer("result_gathered")->nullable();
+            $table->integer("result_gathered")->nullable()->default(0);
         });
     }
 
