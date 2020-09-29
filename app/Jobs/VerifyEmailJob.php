@@ -144,35 +144,16 @@ class VerifyEmailJob implements ShouldQueue
 
     public function checkEmails($emails)
     {
-        $header = [
-            'Accept: application/json',
-            'Content-Type: application/json'
-        ];
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
         // $mail_checking_server = 'https://check01.adcheki.jp';
-        $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        $payload = [
             'emails' => $emails,
             'job_id' => $this->job->getJobId(),
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
-        ]));
-        $result = curl_exec($ch);   
-        if (curl_errno($ch)) {
-            $error_msg = curl_error($ch);
-            Log::error('curl error: ' . $error_msg);
-        }
-        $result = json_decode($result, true);
-        curl_close($ch);
-        // $result = $this->mockEmailCheck($emails, $this->job->getJobId());
-        return $result;
+        ];
+        return sendRequest($mail_checking_server, json_encode($payload));
     }
 
     public function mockEmailCheck($emails){

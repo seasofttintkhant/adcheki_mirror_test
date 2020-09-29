@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\EmailCollection;
 use App\Models\Contact;
+use App\Models\Job;
 use GuzzleHttp\Exception\GuzzleException;
 
 class EmailController extends Controller
@@ -180,18 +181,11 @@ class EmailController extends Controller
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
         // $mail_checking_server = 'https://check01.adcheki.jp';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $mail_checking_server);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        $payload = [
             'emails' => $emails,
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
-        ]));
-        $result = curl_exec($ch);
-        $result = json_decode($result, true);
-        curl_close($ch);
+        ];
+        $result = sendRequest($mail_checking_server, json_encode($payload));
 
         $deviceEmails = [];
         foreach ($emails as $email) {
@@ -210,18 +204,11 @@ class EmailController extends Controller
             'emails' => $deviceEmails
         ];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+        $payload = [
             'device' => $device,
             'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
-        ]));
-        $result = curl_exec($ch);
-        $result = json_decode($result, true);
-        curl_close($ch);
+        ];
+        $result = sendRequest(env('ISOLATED_BACKEND_URL'), json_encode($payload));
 
         if ($result['status'] === 'success') {
             $formattedEmails = [];
@@ -263,23 +250,11 @@ class EmailController extends Controller
                 ]);
             }
 
-            $header = [
-                'Accept: application/json',
-                'Content-Type: application/json'
-            ];
-
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, env('ISOLATED_BACKEND_URL'));
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+            $payload = [
                 'emails' => $device->emails,
                 'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
-            ]));
-            $result = curl_exec($ch);
-            $result = json_decode($result, true);
-            curl_close($ch);
+            ];
+            $result = sendRequest(env('ISOLATED_BACKEND_URL'), json_encode($payload));
 
             if ($result['status'] === 'success') {
                 Email::whereIn("id", $device->emails->pluck("id")->toArray())->delete();
@@ -342,6 +317,7 @@ class EmailController extends Controller
             
             Contact::where("device_id", $existingDevice->id)->delete();
             Email::where("device_id", $existingDevice->id)->delete();
+            Job::where("device_id", $existingDevice->id)->delete();
 
             $this->pushNotiToDevice($existingDevice->fcm_token);
             
