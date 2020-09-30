@@ -96,7 +96,7 @@ class EVSController extends Controller
             if($job){
                 $job->update([
                     "last_email" => $email,
-                    "last_email_completion_time" => now()
+                    "last_email_completion_time" => time()
                 ]);
                 Email::where("device_id", $job->device_id)->where("email", $email)->update([
                     'email' => $email,

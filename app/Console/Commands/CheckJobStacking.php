@@ -47,7 +47,7 @@ class CheckJobStacking extends Command
     {
         //
         $max_time = env("MAX_EXEC_TIME_OF_JOB_AFTER_ONE_MAIL_CHECKED",300);
-        // $max_time = 1;
+        // $max_time = 5;
         $running_jobs = Job::all();
         if(count($running_jobs)){
             $found_device_id = "";
@@ -57,7 +57,7 @@ class CheckJobStacking extends Command
                     if(((time() - $running_job->last_email_completion_time) >= $max_time) || ($found_device_id == $running_job->device_id)){
                         $found_device_id = $running_job->device_id;
                         ProcessingIp::where("job_id", $running_job->id)->delete();
-                        $device = Device::with("emails")->where("id", $running_job->device_id)->where("is_checked", "<>", 1)->first();
+                        $device = Device::with("emails")->where("id", $running_job->device_id)->first();
                         if($device->emails){
                             $payload = [
                                 'emails' => $device->emails,
@@ -85,7 +85,7 @@ class CheckJobStacking extends Command
                             $audit->save();
                         }
                         $running_job->delete();
-                        echo "time excced and stoped";
+                        echo "time excced and stoped!";
                     }else{
                         echo "time is not excced yet!";
                     }

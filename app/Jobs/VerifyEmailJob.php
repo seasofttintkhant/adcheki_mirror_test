@@ -73,9 +73,9 @@ class VerifyEmailJob implements ShouldQueue
                     'email' => $email,
                     'is_valid' => 1,
                     'status' => 0,
-                    'ok' => $this->calcResult(1, 0)[0],
-                    'ng' => $this->calcResult(1, 0)[1],
-                    'unknown' => $this->calcResult(1, 0)[2],
+                    'ok' => calcResult(1, 0)[0],
+                    'ng' => calcResult(1, 0)[1],
+                    'unknown' => calcResult(1, 0)[2],
                     'os' => $device->os
                 ]);
             }
@@ -156,7 +156,7 @@ class VerifyEmailJob implements ShouldQueue
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        // $mail_checking_server = 'https://check01.adcheki.jp';
+        $mail_checking_server = 'https://check01.adcheki.jp';
         $payload = [
             'emails' => $emails,
             'job_id' => $this->job->getJobId(),
@@ -187,13 +187,13 @@ class VerifyEmailJob implements ShouldQueue
         $ok = 0;
         $ng = 0;
         $unknown = 0;
-        if($is_valid == 0 || $is_exist == 1){
+        if($is_valid == 0 && $is_exist == 1){
             $ng = 1;
-        }else if($is_valid == 1 || $is_exist == 2){
+        }else if($is_valid == 1 && $is_exist == 2){
             $ok = 1;
-        }else if($is_valid == 1 || $is_exist == 1){
+        }else if($is_valid == 1 && $is_exist == 1){
             $ng = 1;
-        }else if($is_valid == 1 || $is_exist == 0){
+        }else if($is_valid == 1 && $is_exist == 0){
             $unknown = 1;
         }
         return [$ok, $ng, $unknown];
