@@ -57,17 +57,27 @@ class CheckJobStacking extends Command
                     if(((time() - $running_job->last_email_completion_time) >= $max_time) || ($found_device_id == $running_job->device_id)){
                         $found_device_id = $running_job->device_id;
                         ProcessingIp::where("job_id", $running_job->id)->delete();
+                        $device = Device::with("emails")->where("id", $running_job->device_id)->where("is_checked", "<>", 1)->first();
+                        if($device->emails){
+                            $payload = [
+                                'emails' => $device->emails,
+                                'secret_key' => env('ISOLATED_BACKEND_SECRET_KEY')
+                            ];
+                            sendRequest(env('ISOLATED_BACKEND_URL'), json_encode($payload));
+                        }
+
                         Email::where("device_id", $running_job->device_id)->delete();
+
                         $contact = Contact::find($running_job->contact_id);
                         if($contact){
                             $contact->delete();
                         }
-                        $device = Device::where("id", $running_job->device_id)->where("is_checked", "<>", 1)->first();
+
                         if($device){
-                            $device->is_checked = 1;
-                            $device->save();
                             $this->pushNotiToDevice($device->fcm_token);
+                            $device->delete();
                         }
+
                         $audit = Audit::find($running_job->audit_id);
                         if($audit){
                             $audit->result_pushed_date = now();

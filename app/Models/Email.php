@@ -17,7 +17,8 @@ class Email extends Model
         'ok',
         'ng',
         'unknown',
-        'os'
+        'os',
+        'is_checked'
     ];
 
     public function device()

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\Audit;
+use App\Models\Device;
 use App\Models\Domain;
 use App\Models\Email;
 use App\Models\Job;
 use App\Models\Setting;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class EVSController extends Controller
@@ -79,28 +82,47 @@ class EVSController extends Controller
     }
 
     public function updateJobAndEmailResult(Request $request){
+        \Log::info("HIT ".$request->get("job_id", ""));
         if($request->get("secret_key", "no_key") != env("EVS_SECRET_KEY")){
             return response()->json([]);
         }
         
         $email = $request->get("email", "");
         $is_valid = $request->get("is_valid", 1);
-        $is_exist = $request->get("is_exist", 0);
+        $is_exist = $request->get("status", 0);
         $job_id = $request->get("job_id", "");
         if($email && $job_id){
             $job = Job::where("id",$job_id)->first();
-            $job->update([
-                "last_email" => $email
-            ]);
-            Email::where("device_id", $job->device_id)->where("email", $email)->update([
-                'email' => $email,
-                'is_valid' => $is_valid,
-                'status' => $is_exist,
-                'ok' => $this->calcResult($is_valid, $is_exist)[0],
-                'ng' => $this->calcResult($is_valid, $is_exist)[1],
-                'unknown' => $this->calcResult($is_valid, $is_exist)[2]
-            ]);
+            if($job){
+                $job->update([
+                    "last_email" => $email,
+                    "last_email_completion_time" => now()
+                ]);
+                Email::where("device_id", $job->device_id)->where("email", $email)->update([
+                    'email' => $email,
+                    'is_valid' => $is_valid,
+                    'status' => $is_exist,
+                    'ok' => calcResult($is_valid, $is_exist)[0],
+                    'ng' => calcResult($is_valid, $is_exist)[1],
+                    'unknown' => calcResult($is_valid, $is_exist)[2],
+                    'is_checked' => 1
+                ]);
+
+                $unchecked_emails = Email::where("device_id", $job->device_id)->where("is_checked", 0)->count();
+
+                if (!$unchecked_emails) {
+                    $device = Device::where("id", $job->device_id)->first();
+                    $audit = Audit::where("id", $job->audit_id)->first();
+                    \Log::info("SEND PUSH");
+                    pushNotiToDevice($device->fcm_token);
+                    $audit->update(['result_pushed_date' => now()]);
+                    $device->is_checked = true;
+                    $device->save();
+                }
+            }
         }
+        \Log::info("");
+        \Log::info("");
         return response()->json([]);
     }
 }
