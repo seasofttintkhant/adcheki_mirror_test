@@ -156,7 +156,7 @@ class VerifyEmailJob implements ShouldQueue
         $mail_checking_servers = env('MAIL_CHECKING_SERVERS', '');
         $mail_checking_servers = explode(',', $mail_checking_servers);
         $mail_checking_server = $mail_checking_servers[array_rand($mail_checking_servers)];
-        $mail_checking_server = 'https://check01.adcheki.jp';
+        // $mail_checking_server = 'https://check01.adcheki.jp';
         $payload = [
             'emails' => $emails,
             'job_id' => $this->job->getJobId(),
