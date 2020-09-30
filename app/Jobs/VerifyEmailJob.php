@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\Audit;
 use App\Models\Contact;
 use App\Models\Device;
+use App\Models\Email;
 use App\Models\Job;
 use App\Models\TempEmail;
 use GuzzleHttp\Client;
@@ -58,7 +59,8 @@ class VerifyEmailJob implements ShouldQueue
         $checkedEmails = [];
         foreach (array_chunk($this->emails, 25) as $emails) {
             
-            if (!Device::where('id', $this->device_id)->exists()) {
+            $device = Device::latest()->with('emails')->find($this->device_id);
+            if (!$device) {
                 break;
             }
 
@@ -67,40 +69,47 @@ class VerifyEmailJob implements ShouldQueue
                 if (!in_array(Str::lower($email), $uniqueEmails)) {
                     $uniqueEmails[] = Str::lower($email);
                 }
-            }
-
-            $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));         
-            // $checkedEmails = array_merge($checkedEmails, $this->mockEmailCheck($uniqueEmails));         
-        }
-
-        $device = Device::latest()->with('emails')->find($this->device_id);
-
-        if ($device) {
-            foreach ($this->emails as $email) {
-                $is_valid = $checkedEmails[Str::lower($email)]['is_valid'];
-                $is_exist = $checkedEmails[Str::lower($email)]['status'];
                 $device->emails()->create([
                     'email' => $email,
-                    'is_valid' => $is_valid,
-                    'status' => $is_exist,
-                    'ok' => $this->calcResult($is_valid, $is_exist)[0],
-                    'ng' => $this->calcResult($is_valid, $is_exist)[1],
-                    'unknown' => $this->calcResult($is_valid, $is_exist)[2],
+                    'is_valid' => 1,
+                    'status' => 0,
+                    'ok' => $this->calcResult(1, 0)[0],
+                    'ng' => $this->calcResult(1, 0)[1],
+                    'unknown' => $this->calcResult(1, 0)[2],
                     'os' => $device->os
                 ]);
             }
 
-            $device->refresh();
+            $this->checkEmails($uniqueEmails);
 
-            $audit = Audit::findOrFail($this->audit_id);
-
-            if ($audit->total_email_received == $device->emails()->count()) {
-                $this->pushNotiToDevice($device->fcm_token);
-                $audit->update(['result_pushed_date' => now()]);
-                $device->is_checked = true;
-                $device->save();
-            }
+            // $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));         
+            // $checkedEmails = array_merge($checkedEmails, $this->mockEmailCheck($uniqueEmails));         
         }
+
+        // foreach ($this->emails as $email) {
+        //     $is_valid = $checkedEmails[Str::lower($email)]['is_valid'];
+        //     $is_exist = $checkedEmails[Str::lower($email)]['status'];
+        //     $device->emails()->create([
+        //         'email' => $email,
+        //         'is_valid' => $is_valid,
+        //         'status' => $is_exist,
+        //         'ok' => $this->calcResult($is_valid, $is_exist)[0],
+        //         'ng' => $this->calcResult($is_valid, $is_exist)[1],
+        //         'unknown' => $this->calcResult($is_valid, $is_exist)[2],
+        //         'os' => $device->os
+        //     ]);
+        // }
+
+        // $device->refresh();
+
+        // $audit = Audit::findOrFail($this->audit_id);
+
+        // if ($audit->total_email_received == $device->emails()->count()) {
+        //     $this->pushNotiToDevice($device->fcm_token);
+        //     $audit->update(['result_pushed_date' => now()]);
+        //     $device->is_checked = true;
+        //     $device->save();
+        // }
     }
 
     protected function pushNotiToDevice($fcmToken)

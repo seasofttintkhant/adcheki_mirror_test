@@ -26,6 +26,6 @@ Route::prefix('v1')->group(function () {
     Route::get('email/completed', 'EmailController@completed');
     Route::post('email/cancel', 'EmailController@cancel');
 
-    Route::get("get-domains", 'EVSController@getIpDomains');
-    Route::get("update-job", 'EVSController@updateJob');
+    Route::post("get-domains", 'EVSController@getIpDomains');
+    Route::post("update-job-and-email-result", 'EVSController@updateJobAndEmailResult');
 });

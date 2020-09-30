@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Domain;
+use App\Models\Email;
 use App\Models\Job;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -12,36 +13,19 @@ class EVSController extends Controller
 {
     //
     public function getIpDomains(Request $request){
-        // $a = 1;
-        // while ($a <= 250) {
-        //     Domain::insert([
-        //         "name" => $a.".com",
-        //         "default_ip" => $a.".".$a.".".$a.".".$a,
-        //         "dns_ip" => $a.".".$a.".".$a.".".$a,
-        //         "is_match" => 1
-        //     ]);
-        //     $a++;
-        // }
-        // return "xx";
-        if($request->get("secret_key", "no_key") != env("ISOLATED_BACKEND_SECRET_KEY")){
+        if($request->get("secret_key", "no_key") != env("EVS_SECRET_KEY")){
             return response()->json([]);
         }
 
         $key = $request->get("key", "");
-        $local_ip_domains = $request->get("local_ip_domains", "");
+        $local_ip_domains = $request->get("local_ip_domains", []);
         $email_count = $request->get("email_count", 0);
         $ips_domains = [];
-
-        // $key = "srv1_first_ip_id_to_use";
-        // $local_ip_domains = "1.1.1.1,2.2.2.2,3.3.3.3";
-        // $email_count = 2;
 
         if($key && $local_ip_domains && $email_count){
             $setting = Setting::where("key", $key)->first();
             if($setting){
                 $starting_ip = $setting->value;
-                $local_ip_domains = explode(",", $local_ip_domains);
-                
                 $system_ip_domains = Domain::whereIn("default_ip", $local_ip_domains)->where("is_match", 1)->orderBy("id", "ASC")->get();
                 $server_ip_domains = [];
                 foreach($system_ip_domains as $system_ip_domain){
@@ -94,12 +78,27 @@ class EVSController extends Controller
         return response()->json($ips_domains);
     }
 
-    public function updateJob(Request $request){
+    public function updateJobAndEmailResult(Request $request){
+        if($request->get("secret_key", "no_key") != env("EVS_SECRET_KEY")){
+            return response()->json([]);
+        }
+        
         $email = $request->get("email", "");
+        $is_valid = $request->get("is_valid", 1);
+        $is_exist = $request->get("is_exist", 0);
         $job_id = $request->get("job_id", "");
         if($email && $job_id){
-            Job::where("id",$job_id)->update([
+            $job = Job::where("id",$job_id)->first();
+            $job->update([
                 "last_email" => $email
+            ]);
+            Email::where("device_id", $job->device_id)->where("email", $email)->update([
+                'email' => $email,
+                'is_valid' => $is_valid,
+                'status' => $is_exist,
+                'ok' => $this->calcResult($is_valid, $is_exist)[0],
+                'ng' => $this->calcResult($is_valid, $is_exist)[1],
+                'unknown' => $this->calcResult($is_valid, $is_exist)[2]
             ]);
         }
         return response()->json([]);
