@@ -99,7 +99,6 @@ class EVSController extends Controller
                     "last_email_completion_time" => time()
                 ]);
                 Email::where("device_id", $job->device_id)->where("email", $email)->update([
-                    'email' => $email,
                     'is_valid' => $is_valid,
                     'status' => $is_exist,
                     'ok' => calcResult($is_valid, $is_exist)[0],
