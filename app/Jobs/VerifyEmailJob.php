@@ -55,8 +55,6 @@ class VerifyEmailJob implements ShouldQueue
         $job->device_id = $this->device_id;
         $job->contact_id = $this->contact_id;
         $job->save();
-
-        $checkedEmails = [];
         foreach (array_chunk($this->emails, 25) as $emails) {
             
             $device = Device::latest()->with('emails')->find($this->device_id);
@@ -80,36 +78,8 @@ class VerifyEmailJob implements ShouldQueue
                 ]);
             }
 
-            $this->checkEmails($uniqueEmails);
-
-            // $checkedEmails = array_merge($checkedEmails, $this->checkEmails($uniqueEmails));         
-            // $checkedEmails = array_merge($checkedEmails, $this->mockEmailCheck($uniqueEmails));         
+            $this->checkEmails($uniqueEmails);       
         }
-
-        // foreach ($this->emails as $email) {
-        //     $is_valid = $checkedEmails[Str::lower($email)]['is_valid'];
-        //     $is_exist = $checkedEmails[Str::lower($email)]['status'];
-        //     $device->emails()->create([
-        //         'email' => $email,
-        //         'is_valid' => $is_valid,
-        //         'status' => $is_exist,
-        //         'ok' => $this->calcResult($is_valid, $is_exist)[0],
-        //         'ng' => $this->calcResult($is_valid, $is_exist)[1],
-        //         'unknown' => $this->calcResult($is_valid, $is_exist)[2],
-        //         'os' => $device->os
-        //     ]);
-        // }
-
-        // $device->refresh();
-
-        // $audit = Audit::findOrFail($this->audit_id);
-
-        // if ($audit->total_email_received == $device->emails()->count()) {
-        //     $this->pushNotiToDevice($device->fcm_token);
-        //     $audit->update(['result_pushed_date' => now()]);
-        //     $device->is_checked = true;
-        //     $device->save();
-        // }
     }
 
     protected function pushNotiToDevice($fcmToken)
