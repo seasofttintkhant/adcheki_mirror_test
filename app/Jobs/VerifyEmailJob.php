@@ -55,6 +55,7 @@ class VerifyEmailJob implements ShouldQueue
         $job->device_id = $this->device_id;
         $job->contact_id = $this->contact_id;
         $job->save();
+        \Log::info("JOB START WORKING");
         foreach (array_chunk($this->emails, 25) as $emails) {
             
             $device = Device::latest()->with('emails')->find($this->device_id);
@@ -67,15 +68,6 @@ class VerifyEmailJob implements ShouldQueue
                 if (!in_array(Str::lower($email), $uniqueEmails)) {
                     $uniqueEmails[] = Str::lower($email);
                 }
-                $device->emails()->create([
-                    'email' => $email,
-                    'is_valid' => 1,
-                    'status' => 0,
-                    'ok' => calcResult(1, 0)[0],
-                    'ng' => calcResult(1, 0)[1],
-                    'unknown' => calcResult(1, 0)[2],
-                    'os' => $device->os
-                ]);
             }
 
             $this->checkEmails($uniqueEmails);       
@@ -132,6 +124,7 @@ class VerifyEmailJob implements ShouldQueue
             'job_id' => $this->job->getJobId(),
             'secret_key' => env('MAIL_CHECKING_SERVER_SECRET_KEY', '')
         ];
+        \Log::info("SEND TO EVS");
         return sendRequest($mail_checking_server, json_encode($payload));
     }
 

@@ -82,7 +82,6 @@ class EVSController extends Controller
     }
 
     public function updateJobAndEmailResult(Request $request){
-        \Log::info("HIT ".$request->get("job_id", ""));
         if($request->get("secret_key", "no_key") != env("EVS_SECRET_KEY")){
             return response()->json([]);
         }
@@ -94,6 +93,8 @@ class EVSController extends Controller
         if($email && $job_id){
             $job = Job::where("id",$job_id)->first();
             if($job){
+                \Log::info("HIT FROM EVS: JOB_ID ".$job_id);
+                \Log::info("HIT FROM EVS: DEVICE_ID ".$job->device_id);
                 $job->update([
                     "last_email" => $email,
                     "last_email_completion_time" => time()
@@ -111,17 +112,20 @@ class EVSController extends Controller
 
                 if (!$unchecked_emails) {
                     $device = Device::where("id", $job->device_id)->first();
-                    $audit = Audit::where("id", $job->audit_id)->first();
-                    \Log::info("SEND PUSH");
-                    pushNotiToDevice($device->fcm_token);
-                    $audit->update(['result_pushed_date' => now()]);
-                    $device->is_checked = true;
-                    $device->save();
+                    if($device){
+                        $audit = Audit::where("id", $job->audit_id)->first();
+                        \Log::info("SEND PUSH");
+                        \Log::info("END");
+                        pushNotiToDevice($device->fcm_token);
+                        $audit->update(['result_pushed_date' => now()]);
+                        $device->is_checked = true;
+                        $device->save();
+                    }
+                }else{
+                    \Log::info("EMAILS STILL LEFT");
                 }
             }
         }
-        \Log::info("");
-        \Log::info("");
         return response()->json([]);
     }
 }

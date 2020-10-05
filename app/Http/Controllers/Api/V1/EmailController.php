@@ -25,6 +25,7 @@ class EmailController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info("START");
         $contacts = json_decode($request->contacts, true);
         if ($request->device_id === null
         || $request->fcm_token === null
@@ -65,6 +66,16 @@ class EmailController extends Controller
             ]);
             foreach ($contact['emails'] as $email) {
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $storedDevice->emails()->create([
+                        'email' => $email,
+                        'is_valid' => 1,
+                        'status' => 0,
+                        'ok' => calcResult(1, 0)[0],
+                        'ng' => calcResult(1, 0)[1],
+                        'unknown' => calcResult(1, 0)[2],
+                        'os' => $storedDevice->os,
+                        'is_checked' => 0
+                    ]);
                     if (!in_array($email, $emails)) {
                         array_push($emails, $email);
                     }
@@ -76,7 +87,8 @@ class EmailController extends Controller
                         'ok' => 0,
                         'ng' => 1,
                         'unknown' => 0,
-                        'os' => $storedDevice->os
+                        'os' => $storedDevice->os,
+                        'is_checked' => 1
                     ]);
                 }
             }
