@@ -76,9 +76,7 @@ class EmailController extends Controller
                         'os' => $storedDevice->os,
                         'is_checked' => 0
                     ]);
-                    if (!in_array($email, $emails)) {
-                        array_push($emails, $email);
-                    }
+                    $emails[] = $email;
                 } else {
                     $storedDevice->emails()->create([
                         'email' => $email . '@junk',
@@ -99,11 +97,12 @@ class EmailController extends Controller
         $audit = Audit::create([
             'device_id' => $storedDevice->device_id,
             'os' => $storedDevice->os,
-            'total_email_received' => $storedDevice->emails()->count() + count($emails),
+            'total_email_received' => count($emails),
             'email_received_date' => now()
         ]);
+        $emails = array_unique($emails);
         if (count($emails) > 0) {
-            foreach (array_chunk($emails, 100) as $chunkedEmails) {
+            foreach (array_chunk($emails, 1000) as $chunkedEmails) {
                 VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id, $contact->id);
             };
         } else {

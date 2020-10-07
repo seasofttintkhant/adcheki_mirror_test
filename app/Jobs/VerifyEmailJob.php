@@ -56,22 +56,22 @@ class VerifyEmailJob implements ShouldQueue
         $job->contact_id = $this->contact_id;
         $job->save();
         \Log::info("JOB START WORKING");
-        foreach (array_chunk($this->emails, 25) as $emails) {
+        // foreach (array_chunk($this->emails, 25) as $emails) {
             
             $device = Device::latest()->with('emails')->find($this->device_id);
-            if (!$device) {
-                break;
-            }
+            // if (!$device) {
+            //     break;
+            // }
 
             $uniqueEmails = [];
-            foreach ($emails as $email) {
+            foreach ($this->emails as $email) {
                 if (!in_array(Str::lower($email), $uniqueEmails)) {
                     $uniqueEmails[] = Str::lower($email);
                 }
             }
 
             $this->checkEmails($uniqueEmails);       
-        }
+        // }
     }
 
     protected function pushNotiToDevice($fcmToken)
