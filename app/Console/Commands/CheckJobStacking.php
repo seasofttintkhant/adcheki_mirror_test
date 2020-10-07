@@ -84,6 +84,7 @@ class CheckJobStacking extends Command
                             $audit->system_canceled_date = now();
                             $audit->save();
                         }
+                        Job::where("device_id", $running_job->device_id)->delete();
                         $running_job->delete();
                         echo "time excced and stoped!";
                     }else{
