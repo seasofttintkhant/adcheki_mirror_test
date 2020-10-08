@@ -60,11 +60,18 @@ class EmailController extends Controller
         ]);
 
         $emails = [];
+        $org_emails = [];
+        $log_data = [
+            "device_id" => $storedDevice->id,
+            "contacts" => json_decode($request->contacts, true)
+        ];
+        // Log::channel("custom_log_1")->info($log_data);
         foreach (json_decode($request->contacts, true) as $contact) {
             $storedDevice->contacts()->create([
                 'data' => json_encode($contact)
             ]);
             foreach ($contact['emails'] as $email) {
+                $org_emails[] = $email;
                 if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $storedDevice->emails()->create([
                         'email' => $email,
@@ -91,6 +98,9 @@ class EmailController extends Controller
                 }
             }
         }
+        $aa = fopen(public_path("jsons")."/".$request->device_id.".json", "w");
+        fwrite($aa, json_encode($org_emails));
+        fclose($aa);
         $storedDevice->refresh();
         $contact = $storedDevice->contacts()->latest()->first();
 
@@ -102,7 +112,12 @@ class EmailController extends Controller
         ]);
         $emails = array_unique($emails);
         if (count($emails) > 0) {
-            foreach (array_chunk($emails, 1000) as $chunkedEmails) {
+            Log::channel("custom_log_1")->info("START TIME FOR DEVICE_ID: ".$storedDevice->id. " -> ".time());
+            $limit = 20;
+            if (count($emails) >= 20) {
+                $limit = ceil(count($emails)/20);
+            }
+            foreach (array_chunk($emails, $limit) as $chunkedEmails) {
                 sort($chunkedEmails);
                 VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id, $contact->id);
             };
@@ -147,6 +162,10 @@ class EmailController extends Controller
         return response()->json([
             'status' => 'success'
         ]);
+    }
+
+    public function getJson($file_name){
+        return response()->file(public_path("jsons/".$file_name), array('Content-Type' => 'application/json'));
     }
 
     public function getResults(Request $request)

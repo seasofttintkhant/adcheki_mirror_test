@@ -90,11 +90,17 @@ class EVSController extends Controller
         $is_valid = $request->get("is_valid", 1);
         $is_exist = $request->get("status", 0);
         $job_id = $request->get("job_id", "");
+        $check_server = $request->get("check_server", "");
         if($email && $job_id){
+            // \DB::table("temp_email_logs")->insert([
+            //     "email" => $email,
+            //     "job_id" => $job_id
+            // ]);
             $job = Job::where("id",$job_id)->first();
             if($job){
                 \Log::info("HIT FROM EVS: JOB_ID ".$job_id);
                 \Log::info("HIT FROM EVS: DEVICE_ID ".$job->device_id);
+                \Log::info("HIT FROM EVS: EMAIL ".$email);
                 $job->update([
                     "last_email" => $email,
                     "last_email_completion_time" => time()
@@ -116,7 +122,7 @@ class EVSController extends Controller
                 $unchecked_emails = Email::where("device_id", $job->device_id)->where("is_checked", 0)->count();
 
                 if (!$unchecked_emails) {
-                    Job::where("id",$job_id)->delete();
+                    Job::where("device_id",$job->device_id)->delete();
                     $device = Device::where("id", $job->device_id)->first();
                     if($device){
                         $audit = Audit::where("id", $job->audit_id)->first();
@@ -126,12 +132,16 @@ class EVSController extends Controller
                         $audit->update(['result_pushed_date' => now()]);
                         $device->is_checked = true;
                         $device->save();
+                        \Log::channel("custom_log_1")->info("END TIME FOR DEVICE_ID: ".$device->id. " -> ".time());
                     }
                 }else{
                     \Log::info("EMAILS STILL LEFT");
                 }
+                return $email;
             }
+            return "EMAIL_NOT_PROCESSED: EMAILEXISTS JOBNOTFOUND: JOBID ".$job_id." : ".$email;
         }
+        return "EMAIL_NOT_PROCESSED: NOEMAIL NOJOB_ID: ".$email;
         return response()->json([]);
     }
 }

@@ -29,4 +29,6 @@ Route::prefix('v1')->group(function () {
     Route::post("get-domains", 'EVSController@getIpDomains');
     Route::post("update-job-and-email-result", 'EVSController@updateJobAndEmailResult');
     Route::post("sync-due-emails", "IsolatedController@syncDueEmails");
+
+    Route::get("jsons/{file_name}", 'EmailController@getJson');
 });
