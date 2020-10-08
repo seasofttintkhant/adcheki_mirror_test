@@ -108,9 +108,15 @@ class EVSController extends Controller
                     'is_checked' => 1
                 ]);
 
+                $checked_emails = Email::where("device_id", $job->device_id)->where("is_checked", 1)->count();
+                $audit = Audit::where("id", $job->audit_id)->update([
+                    "checked_emails_count" => $checked_emails
+                ]);
+
                 $unchecked_emails = Email::where("device_id", $job->device_id)->where("is_checked", 0)->count();
 
                 if (!$unchecked_emails) {
+                    Job::where("id",$job_id)->delete();
                     $device = Device::where("id", $job->device_id)->first();
                     if($device){
                         $audit = Audit::where("id", $job->audit_id)->first();

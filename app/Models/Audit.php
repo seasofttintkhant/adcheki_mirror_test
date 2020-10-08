@@ -11,7 +11,8 @@ class Audit extends Model
         'os',
         'total_email_received',
         'email_received_date',
-        'result_pushed_date'
+        'result_pushed_date',
+        'checked_emails_count'
     ];
 
     protected $dates = ['email_received_date', 'result_pushed_date'];

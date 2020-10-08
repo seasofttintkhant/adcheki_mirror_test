@@ -103,6 +103,7 @@ class EmailController extends Controller
         $emails = array_unique($emails);
         if (count($emails) > 0) {
             foreach (array_chunk($emails, 1000) as $chunkedEmails) {
+                sort($chunkedEmails);
                 VerifyEmailJob::dispatch($storedDevice->id, $chunkedEmails, $audit->id, $contact->id);
             };
         } else {
